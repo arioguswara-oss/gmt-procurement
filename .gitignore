@@ -1,0 +1,39 @@
+# Ignore development/build/runtime state
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+build/
+coverage/
+**/*.tsbuildinfo
+*.log
+*.log.*
+tmp/
+storage/*
+!storage/.gitkeep
+uploads/
+**/uploads/
+*.db
+*.sqlite*
+*.sql.dump
+*.dump
+*.bak
+*.pem
+*.p12
+*.pfx
+id_rsa*
+# All environment files (including examples until individually reviewed)
+.env
+.env.*
+**/.env
+**/.env.*
+# cPanel secrets and local runtime settings
+deploy/backup/backup.env
+# No nested historical patch bundles in source control
+*.zip
+*.tar
+*.tar.gz
+# IDE/OS
+.DS_Store
+.idea/
+.vscode/
