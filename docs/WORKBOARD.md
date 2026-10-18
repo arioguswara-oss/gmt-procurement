@@ -69,3 +69,12 @@ Progres source tidak disamakan dengan hosting. READY TO DEPLOY hanya jika syntax
 - Blockers: perlu akses byte ZIP untuk pemeriksaan ulang; test script gate harus dijalankan di sandbox Hermes sebelum import source; full build/test belum ada.
 - NEXT: verifikasi `python3 -m unittest discover -s scripts -p 'test*.py' -v` dan preflight ZIP pada lingkungan yang memperoleh source secara sah, lalu scoped source import; tidak ada merge/deploy/migration.
 - Hosting Verification: NOT VERIFIED. Deploy Readiness: NOT READY. LOCK: NO.
+
+## Checkpoint P0-IMPORT — Hermes ZIP Gate unit tests (2026-10-19, 04:09 WIB)
+- Screenshot Rio menunjukkan perintah pengujian `sudo -H -u gmtci bash` mengambil dua file langsung dari **commit terverifikasi** `668be644cf60cfdc3e3aab0f7a3b291466874bfd` menggunakan `git archive` ke direktori sementara.
+- Test dijalankan dengan `bwrap --unshare-user --unshare-pid --unshare-net` dan source test dimount read-only.
+- Keempat tes lulus: valid archive requires review, unsafe path fail closed, sensitive content blocked, runtime files never candidates.
+- Log akhir `Ran 4 tests ... OK` dan `ZIP_GATE_TEST_PASS`; prompt terminal kembali. Folder sementara diatur untuk dibersihkan via trap.
+- **FAKTA:** Gate unit tests **4/4 PASS** di Hermes. BUKAN bukti ZIP `gmt-procurement.zip` sendiri telah diaudit, diimpor, atau siap deploy.
+- **NEXT:** pemeriksaan sumber ZIP aktual dengan read-only preflight di lingkungan tepercaya yang memiliki ZIP tersebut. Tinjau hasil, lakukan manual secret review sebelum import source-only; jangan transfer ZIP berisi potensi credential ke VPS hanya demi tes.
+- Code/Test: ZIP gate tests PASS; build/regression aplikasi PENDING. Hosting: NOT VERIFIED. Deploy readiness: NOT READY. LOCK: NO.
