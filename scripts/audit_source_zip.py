@@ -16,6 +16,7 @@ import zipfile
 MAX_ZIP_BYTES = 350_000_000
 MAX_ENTRIES = 60_000
 MAX_CANDIDATE_BYTES = 2_000_000
+MAX_TOTAL_CANDIDATE_BYTES = 35_000_000
 ALLOWED_EXT = {".ts", ".tsx", ".js", ".jsx", ".json", ".prisma",
                ".css", ".scss", ".html", ".mjs", ".cjs", ".sql"}
 ROOT_FILES = {"package.json", "package-lock.json", "pnpm-lock.yaml",
@@ -80,7 +81,7 @@ def is_candidate(relative):
     return False
 
 
-def inspect(path):
+def inspect(path, expected_sha256=None):
     result = {"status": "BLOCKED", "archive_sha256": None, "prefix": None,
               "total_entries": 0, "candidate_files": 0,
               "skipped_entries": 0, "findings": []}
@@ -92,6 +93,9 @@ def inspect(path):
         for block in iter(lambda: stream.read(1024 * 1024), b""):
             sha.update(block)
     result["archive_sha256"] = sha.hexdigest()
+    if expected_sha256 is not None and result["archive_sha256"] != expected_sha256.lower():
+        result["findings"].append("Archive hash mismatch: not the approved source")
+        return result
 
     try:
         with zipfile.ZipFile(path) as archive:
@@ -107,6 +111,7 @@ def inspect(path):
             prefix = find_prefix(names)
             result["prefix"] = prefix
             seen = set()
+            total_candidate_bytes = 0
             for entry in entries:
                 if entry.is_dir() or not entry.filename.startswith(prefix):
                     result["skipped_entries"] += 1
@@ -123,6 +128,10 @@ def inspect(path):
                 if stat.S_ISLNK(entry.external_attr >> 16):
                     result["findings"].append("Symlink candidate: " + relative)
                     continue
+                total_candidate_bytes += entry.file_size
+                if total_candidate_bytes > MAX_TOTAL_CANDIDATE_BYTES:
+                    result["findings"].append("Combined candidate source exceeds safe size cap")
+                    return result
                 if entry.file_size > MAX_CANDIDATE_BYTES:
                     result["findings"].append("Oversize source candidate: " + relative)
                     continue
@@ -152,8 +161,12 @@ def inspect(path):
 def main():
     parser = argparse.ArgumentParser(description="Read-only source archive audit; never imports")
     parser.add_argument("archive", type=Path)
+    parser.add_argument("--expected-sha256", required=True,
+                        help="Known trusted SHA256 of the exact archive from Rio")
     args = parser.parse_args()
-    result = inspect(args.archive)
+    if not re.fullmatch(r"[a-fA-F0-9]{64}", args.expected_sha256):
+        parser.error("--expected-sha256 must be exactly 64 hexadecimal characters")
+    result = inspect(args.archive, expected_sha256=args.expected_sha256)
     print(json.dumps(result, indent=2, sort_keys=True))
     return 0 if result["status"] == "REVIEW_REQUIRED" else 1
 
