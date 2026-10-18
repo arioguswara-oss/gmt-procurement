@@ -57,3 +57,15 @@ Progres source tidak disamakan dengan hosting. READY TO DEPLOY hanya jika syntax
 - scripts/source_guard.py dan 3 unittest: local PASS setelah fixture disesuaikan. GitHub Actions pada PR #1 berstatus FAILURE tanpa langkah job runner pada API. **CI BLOCKED — penyebab belum terverifikasi**; jangan klaim CI pass atau merge.
 - Tidak ada IMAP login, tidak ada panggilan Fonnte, tidak ada Drive write, perubahan database, ataupun hosting/deployment.
 - NEXT SAFE ACTION: verifikasi penyebab workflow gagal dari halaman GitHub Actions, lanjut audit source/seed terpisah, kemudian import source-only ke development branch setelah sanitasi dan review. Jangan merge main sampai seluruh gate sesuai.
+
+## Checkpoint P0-IMPORT — 2026-10-19 (source import preflight)
+- Lane P0-IMPORT owner ChatGPT: masih **IN_PROGRESS**, source lengkap belum masuk repository.
+- New PR #4 DRAFT: https://github.com/arioguswara-oss/gmt-procurement/pull/4
+- Source gate baru: `scripts/audit_source_zip.py` (read-only, fail-closed, tidak extract/upload/execute), `scripts/test_audit_source_zip.py` (empat unit test sintetik), `docs/SOURCE_IMPORT_GATE.md`.
+- Perbaikan keamanan: pemeriksaan path traversal, root ZIP ambigu, symlink, duplicate path, batas ukuran, binary, indikasi credential; hasil tidak mengungkap isi file.
+- **Status source baru: DONE_SOURCE; test belum dieksekusi**, karena tool pemrosesan lokal file sedang tidak tersedia. Jangan klaim tes PASS.
+- Source ZIP historis (konfirmasi Rio): `gmt-procurement.zip`, 200.209.381 bytes; verifikasi isi ulang belum terlaksana pada sesi ini; tidak perlu upload ulang sampai terbukti perlu.
+- Hermes: uji runner awal PR #3 PASS 3 tests dan IDLE PASS, bukan bukti PR #4 maupun full app CI.
+- Blockers: perlu akses byte ZIP untuk pemeriksaan ulang; test script gate harus dijalankan di sandbox Hermes sebelum import source; full build/test belum ada.
+- NEXT: verifikasi `python3 -m unittest discover -s scripts -p 'test*.py' -v` dan preflight ZIP pada lingkungan yang memperoleh source secara sah, lalu scoped source import; tidak ada merge/deploy/migration.
+- Hosting Verification: NOT VERIFIED. Deploy Readiness: NOT READY. LOCK: NO.
