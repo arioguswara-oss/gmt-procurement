@@ -40,13 +40,24 @@ Owner: Rio. Tujuan: **CI manual, on-demand, berhenti setelah pekerjaan selesai**
 6. Proses runner sudah berhenti dan tidak tersisa di background.
 7. Jika gagal: laporkan log yang sudah disanitasi, jangan akses/ubah SANRO dan jangan memaksa `sudo`/Docker.
 
+## Checkpoint uji Hermes — 2026-10-19 (screenshot Rio 03:45 WIB)
+- Akun `gmtci` telah dibuat (UID 993, GID 981; tanpa grup Docker); screenshot sebelumnya.
+- SSH Deploy Key repo `arioguswara-oss/gmt-procurement` terautentikasi; Git clone branch Hermes sukses.
+- Checkout diverifikasi: branch `chatgpt/hermes-ondemand-ci-20261019`, SHA `92eb03e0fccc3e5768cc09a73a3178c63ca5fa47`.
+- `bash -n ci/hermes/run-checks.sh` => `CI_SCRIPT_OK` (PASS).
+- `sudo -H -u gmtci bash /home/gmtci/gmt-procurement/ci/hermes/run-checks.sh` => tiga tes `unittest` OK dan `source_guard` PASS; akhir output `GMT-CI PASS sha=92eb03e0fccc3e5768cc09a73a3178c63ca5fa47`.
+- Perintah telah kembali ke prompt SSH; **belum dilakukan pemeriksaan proses residual**, resource limits/cgroup, ataupun full application build/regression.
+- Tes ini membuktikan smoke test runner offline dan pengamanan dasar, **bukan** CI penuh/production ready. Tidak ada deploy, migration, IMAP, Fonnte, atau Drive write.
+- **NEXT (read-only)**: `ps -u gmtci -o pid,comm,%cpu,%mem`; pastikan tidak ada proses CI tersisa. Jangan aktivasi daemon.
+- Review/merge tetap membutuhkan keputusan Rio. PR #3 tetap DRAFT.
+
 ## Gate yang belum lulus
-- Akun `gmtci` belum dibuat.
-- Read-only GitHub deploy key belum dibuat.
-- Runner belum dipasang atau dijalankan pada Hermes.
+- Akun `gmtci` telah dibuat; masih perlu verifikasi kebijakan hardening dan resource limits.
+- Deploy key GitHub repo sudah dibuat dan SSH terautentikasi; kewenangan read-only sesuai pengaturan Rio, perlu verifikasi setting GitHub bila diaudit.
+- Runner sudah di-clone dan diuji manual via `gmtci` (PASS pada smoke test); proses residual belum diperiksa.
 - Belum ada cgroup/limits yang diverifikasi; isolasi hanya uji dasar.
 - Source baseline aplikasi belum diimpor/di-build secara lengkap.
 - GitHub Actions PR #1 sebelumnya FAILED; tidak dijadikan PASS hanya karena adanya rancangan CI Hermes.
 - Tidak ada migration, package rilis Drive, hosting verification, atau lock.
 
-Tahap berikutnya: Rio menjalankan pemeriksaan *read-only* terhadap keberadaan akun `gmtci` dan permission lingkungan SSH, kemudian dibuat akun khusus jika disetujui. Lakukan semua langkah satu per satu dan verifikasi output sebelum lanjut.
+Tahap berikutnya: periksa proses tersisa milik `gmtci` secara read-only, lalu rencanakan guardrails resource dan tes aplikasi secara terpisah. Lakukan bertahap dengan persetujuan Rio.
