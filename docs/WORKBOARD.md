@@ -21,7 +21,7 @@ Status: READY / IN_PROGRESS / DONE_SOURCE / BLOCKED_HOSTING / BLOCKED_APPROVAL /
 - ZIP: 200,209,381 bytes; 37,761 entri; integritas CRC lengkap diperiksa.
 - SHA-256 arsip: `25ce1448015b34144dc16a67609a61f9ad5dd7ef70fd647b401c3d22caf06813`.
 - Package root 0.15.0, Node >=22; NestJS API, React/Vite frontend, Prisma/MariaDB; source module Project, Partner, Quotation, Document, Activity.
-- Prisma schema terdeteksi: 25 model. Belum ada database production yang diperiksa.
+- Prisma schema terdeteksi: 24 model (dihitung ulang dari deklarasi model). Belum ada database production yang diperiksa.
 - Tidak ditemukan implementasi lengkap konektor IMAP, Fonnte, Notification Center pada source awal; tidak berarti tidak ada layanan di hosting.
 - ZIP memiliki banyak node_modules/dist dan patch historis; jangan unggah apa adanya.
 - Pemindaian pola credential sederhana pada kandidat file source tidak menemukan kecocokan; **bukan** jaminan bebas rahasia.
