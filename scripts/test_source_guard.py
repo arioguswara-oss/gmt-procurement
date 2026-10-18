@@ -14,7 +14,7 @@ class GuardTests(unittest.TestCase):
             self.assertIsNone(path_problem(path), path)
 
     def test_sensitive_content(self):
-        self.assertEqual(content_problem(b'-----BEGIN PRIVATE KEY-----'),
+        self.assertEqual(content_problem(b'-----BEGIN ' + b'PRIVATE KEY-----'),
                          'potential credential material')
         self.assertIsNone(content_problem(b'const token = process.env.FONNTE_TOKEN'))
 
