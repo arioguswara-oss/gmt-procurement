@@ -1,15 +1,14 @@
 {
-  "name": "@gmt/telegram-gateway",
-  "version": "0.1.0",
+  "name": "@gmt/telegram-cloudflare-gateway",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
-  "description": "Read-only Telegram project assistant gateway; not part of Procurement production",
+  "description": "Standalone best-effort Telegram Cloudflare Worker, OFF by default, read-only GitHub",
   "engines": {
     "node": ">=22"
   },
   "scripts": {
-    "start": "node ./src/main.mjs",
-    "test": "node --test",
-    "check": "node --check ./src/core.mjs && node --check ./src/main.mjs"
+    "check": "node --check ./src/core.mjs && node --check ./src/worker.mjs && node --check ./test/worker.test.mjs",
+    "test": "node --test"
   }
 }

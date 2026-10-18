@@ -1,52 +1,54 @@
-# GMT Procurement Telegram AI gateway (standalone)
+# GMT Procurement — Cloudflare Workers Telegram webhook
 
-**STAGE: SOURCE WORK / DRAFT / NOT DEPLOYED / DEFAULT OFF.** No Hermes.
-This is a separate Node >=22 long-polling gateway, not part of Procurement production, SANRO or the WordPress website.
+**STAGE: DRAFT / SOURCE ONLY / NOT DEPLOYED / DEFAULT OFF.** No VPS, no Hermes, no integration with Procurement production. Replaces earlier long-polling gateway design on PR #2.
 
-## What works in source
-- /help and /start: instructions.
-- /status: read-only GitHub snapshot for arioguswara-oss/gmt-procurement (main SHA, open PR metadata, one fixed audit workboard).
-- /ask or normal text: OpenAI Responses API discussion using a bounded snapshot and last four Q/A pairs held in RAM. This does not inherit ChatGPT's chat history, memory or connectors.
-- /whoami: privately shows only the requester's own numeric Telegram user ID; used to configure owner allowlist.
-- Any other user/group: ignored for project actions. Only the exact numeric approved Telegram user ID in its own private chat can receive project status/AI replies.
-- Nothing writes GitHub; nothing emails, sends WhatsApp, reads Drive, touches Procurement DB, or deploys.
+## Scope
 
-## Security and permissions
-- Fail-closed startup: GMT_TELEGRAM_ENABLED=true is required; no live service has been enabled by this PR.
-- Telegram token, OpenAI API key, and GitHub token must be supplied ONLY to an isolated gateway host's protected environment or secrets manager. Do not paste into this chat, Telegram, GitHub, screenshots or Google Drive.
-- Fine-grained GITHUB_READ_TOKEN must be scoped to repo arioguswara-oss/gmt-procurement with **Contents: Read** and **Pull requests: Read** only, shortest practical expiration.
-- Long polling requires no public inbound web server; an existing webhook causes startup refusal rather than automatic deletion.
-- GitHub reads use a fixed allowlist of GET endpoints and no user-controlled repository URL. Workboard text and authorized questions are sent to the OpenAI API, so do not send credentials, customer personal data or private source code. The call requests store:false, which does **not** promise zero processing or retention.
-- OpenAI model has NO tool access or function calls. A user instruction such as "lanjut" is discussion/handoff only, not authorization to alter source, hosting, mail, migration or Drive.
-- Messages are shortened, AI queries throttled, conversation history RAM-only, and errors sanitized. Hosting should cap API spend independently. Restart may replay an unacknowledged Telegram update; no exactly-once guarantee.
-- Drive, if separately approved in a later project, remains limited to Gayuh Mandala Storage Share ID 1Zdui1O0CEA0YvQhSQu2P7Q6Tr2hqP_0A; THIS gateway has no Drive integration.
+Cloudflare Worker receives Telegram webhook `POST /telegram/webhook`, verifies Telegram's `X-Telegram-Bot-Api-Secret-Token` and private Telegram user ID, then responds with `/help`, `/status`, `/ask`, `/whoami`. GitHub API calls are FIXED read-only endpoints to `arioguswara-oss/gmt-procurement`; AI uses OpenAI Responses API (`store:false`) with one-shot repo context, not ChatGPT chat history. Never commit credentials. No write permissions, code execution, merge, production database, Drive, WhatsApp, or SMTP.
 
-## Offline tests
-Run from services/telegram-gateway:
-- node --version (>=22)
-- npm run check
-- npm test
+**Worker modes:** `GMT_TELEGRAM_MODE=off` (default, responds 503); `identity` (ONLY `/whoami` in private Telegram chat after webhook secret verified; no GitHub/OpenAI access); `readonly` (requires owner numeric user ID and read-only GitHub/OpenAI keys). Unknown mode treated as off. `identity` is an explicit, temporary bootstrap option for learning Rio's Telegram numeric user ID. It is **not** a deployment authorization.
 
-No network/service integration is exercised in unit tests; do not call them hosting-verification evidence.
+## Offline verification
 
-## Production-independent setup — NOT authorized by this PR
-1. Rio confirms exact Telegram bot username and numeric personal user ID using a trusted lookup. The gateway requires that allowlist ID **before** full startup (do not start simply to obtain the ID).
-2. Select a separate restricted gateway host (not Procurement production) and configure the secret environment variables:
-   - TELEGRAM_BOT_TOKEN (BotFather secret)
-   - TELEGRAM_ALLOWED_USER_ID (Rio's numeric Telegram ID)
-   - GITHUB_READ_TOKEN (fine-grained, repo-limited READ-only)
-   - OPENAI_API_KEY (budgeted/restricted project)
-   - OPENAI_MODEL (optional; default gpt-4.1-mini, verify account access/pricing)
-   - GMT_TELEGRAM_ENABLED (leave unset/false pending explicit approval)
-3. Verify billing controls, owner ID, transport and outbound HTTPS permissions, current webhook settings, operational ownership, monitoring, manual rollback/shutdown and credentials handling.
-4. **Only after explicit Rio approval:** launch off-production, smoke-test from allowed and denied Telegram accounts, record verified hosting evidence. Never merge or deploy automatically.
+Run in the `services/telegram-gateway` directory with Node.js >=22:
 
-## Workboard checkpoint (2026-10-19)
-Lane P1-TELEGRAM-GATEWAY; owner ChatGPT; status DONE_SOURCE pending PR review; ownership services/telegram-gateway/** plus dedicated CI workflow only. No edits to concurrent audit lane.
-- Overall Source/Foundation: standalone bot source ready; Procurement app source import remains separate.
-- Module Progress: Telegram gateway source implemented (not live).
-- Source/Test Status: local syntax + 7 unit tests PASS; GitHub CI pending verification.
+```sh
+npm run check
+npm test
+```
+
+Unit tests stub all external requests. Real Telegram, Cloudflare and OpenAI integration and GitHub CI remain separate verification gates. The Wrangler configuration is for future manual deployment; no install, binding or webhook registration happens as a result of this PR.
+
+## Secret bindings (Cloudflare dashboard, NOT chat / GitHub)
+
+- `TELEGRAM_BOT_TOKEN`: BotFather token.
+- `TELEGRAM_WEBHOOK_SECRET`: separately generated, random 32-256 character A-Z/a-z/0-9/_/- string; set as Telegram `setWebhook` `secret_token` on explicit activation.
+- `TELEGRAM_ALLOWED_USER_ID`: Rio's exact decimal Telegram private user ID (required for readonly).
+- `GITHUB_READ_TOKEN`: **fine-grained GitHub token restricted to just `gmt-procurement`, Contents: Read and Pull requests: Read**, shortest practical expiration.
+- `OPENAI_API_KEY`: project-specific OpenAI API key, set with spend limits.
+- `OPENAI_MODEL`: optional non-secret string (defaults to `gpt-4.1-mini` subject to model access).
+
+Do not place any secret in wrangler vars or upload it here. Access via Cloudflare Worker environment secret bindings (official Cloudflare guidance). Avoid attaching existing GitHub application tokens with write permissions.
+
+## Controlled activation plan — REQUIRES SEPARATE RIO APPROVAL
+
+1. Rio creates/logs in to a Cloudflare account, prepares a Worker with **automatic GitHub deploy disabled** (do not connect the repo to automatic production deployment). The source branch is DRAFT until checks and approval.
+2. Provision protected secret bindings in Cloudflare dashboard; verify origin of `TELEGRAM_ALLOWED_USER_ID`. Optionally briefly enable `identity` mode for private `/whoami` only to obtain the ID, then switch off.
+3. Verify pricing/budgets, webhook URL, callback signature, uptime and rollback procedure. Security policy must explicitly approve transfer of selected private GitHub workboard metadata and owner queries to the OpenAI API.
+4. After Rio explicitly approves external activation, deploy a Worker with `GMT_TELEGRAM_MODE=readonly`. Manually register HTTPS webhook via Telegram `setWebhook` with matching secret token, `allowed_updates=["message"]`, `max_connections=1`, and **no** `drop_pending_updates`. Do not include token in logs, tickets, URLs or screenshots.
+5. Smoke test authorized/unauthorized Telegram accounts and tests for webhook rejection; verify OpenAI/GitHub billing controls, then record HOSTING VERIFIED only with evidence. To disable: set Worker mode `off` and separately review webhook revocation/rollback. Do not silently modify any existing Telegram webhook.
+
+## Limitations
+
+This minimal prototype processes updates best-effort using Cloudflare `ctx.waitUntil()`. The webhook acknowledges before sending; a crash or slow upstream can cause a lost response, and duplicate Telegram deliveries can create duplicate replies/AI costs. There is no persistent history, queue, globally enforced throttle, exactly-once processing, continuous background work or task execution. Cloudflare's `waitUntil` has a limited lifetime (currently up to 30s); use Queues + Durable Objects for stronger delivery/dedup in an approved later phase. Do not market as production-ready before those trade-offs are accepted. `store:false` does not imply zero retention at OpenAI.
+
+## Lane & status (2026-10-19)
+
+P1-TELEGRAM-GATEWAY | Owner ChatGPT | DONE_SOURCE pending review | Ownership `services/telegram-gateway/**` and dedicated `.github/workflows/telegram-gateway.yml`. Separate from PR #1 (foundation audit) and all Procurement modules.
+
+- Overall Source/Foundation: Standalone Cloudflare webhook design and code; Procurement app import unaffected.
+- Module Progress: webhook core implemented and offline tests prepared.
+- Source/Test: local syntax and offline tests recorded in PR comments. GitHub CI failure from previous commit still needs independent diagnosis.
 - Hosting Verification: NOT VERIFIED.
 - Deploy Readiness: NOT READY.
 - LOCK: NO.
-- Next: Rio reviews this DRAFT PR, chooses isolated host and approves any activation explicitly.
