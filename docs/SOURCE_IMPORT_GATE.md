@@ -4,9 +4,9 @@ Owner: ChatGPT. Approver: Rio. Source of truth saat ini: `gmt-procurement.zip` y
 
 ## Tujuan
 
-Menyiapkan pemeriksaan deterministik sebelum source Procurement masuk GitHub Private. **Tidak mengeksekusi code ZIP, tidak mengekstrak otomatis, tidak mengunggah source, tidak menulis ke Drive, tidak memanggil production.**
+Menyiapkan pemeriksaan deterministik sebelum source Procurement masuk GitHub Private. Pemeriksa ZIP bersifat read-only; skrip staging baru hanya membuat salinan **source terpilih ke direktori lokal baru yang ditentukan operator** setelah gate lulus. Tidak mengeksekusi kode ZIP, tidak mengunggah source, tidak menulis ke Drive, dan tidak memanggil production.
 
-File baru: `scripts/audit_source_zip.py` dan `scripts/test_audit_source_zip.py`.
+File: `scripts/audit_source_zip.py`, `scripts/test_audit_source_zip.py`, `scripts/stage_source_zip.py`, `scripts/test_stage_source_zip.py`.
 
 ## Prinsip kerja
 
@@ -15,16 +15,22 @@ File baru: `scripts/audit_source_zip.py` dan `scripts/test_audit_source_zip.py`.
 3. Menghitung SHA256 seluruh arsip, jumlah entri, serta banyaknya file yang cocok allowlist (tidak pernah mencetak isi file/password/token).
 4. Allowlist: source `apps/api/src`, `apps/web/src`, test source, dan file konfigurasi/build terpilih; patch ZIP, uploads, log, `.env*`, `node_modules`, `dist`, storage, seed, dan migration SQL tidak otomatis disertakan.
 5. Output PASS teknis adalah **`REVIEW_REQUIRED`**, bukan izin mengimpor atau deploy. Administrator/developer tetap harus meninjau file, dependency, schema, migration historis, RBAC, dan sanitasi data.
-6. Semua operasi default read-only. Source baru diimpor setelah isi tersedia dan pemeriksaan manual selesai, pada branch terpisah, tanpa mengganti `main`.
+6. Audit ZIP read-only. Tahap staging hanya membuat salinan file source di folder lokal baru, permission privat dan manifest hash per file. Jika pemeriksaan ditolak tidak ada salinan parsial. Output tetap REVIEW_REQUIRED.
+7. Source baru diimpor ke GitHub hanya setelah human review + kebutuhan build lengkap terpenuhi, pada branch terpisah, tanpa mengganti `main`.
 
 ## Pemakaian nanti di lingkungan yang mempunyai salinan ZIP sah
 
 ```bash
 python3 -m unittest discover -s scripts -p 'test*.py' -v
-python3 scripts/audit_source_zip.py /path/to/gmt-procurement.zip
+python3 scripts/audit_source_zip.py /path/to/gmt-procurement.zip \
+  --expected-sha256 25ce1448015b34144dc16a67609a61f9ad5dd7ef70fd647b401c3d22caf06813
+# Setelah preflight REVIEW_REQUIRED dan di lingkungan lokal terisolasi:
+python3 scripts/stage_source_zip.py /path/to/gmt-procurement.zip \
+  /path/to/new-empty-review-directory \
+  --expected-sha256 25ce1448015b34144dc16a67609a61f9ad5dd7ef70fd647b401c3d22caf06813
 ```
 
-Perintah kedua hanya memeriksa metadata dan isi kandidat dalam memori. Jangan memakainya untuk mengaudit path di luar data yang Rio berikan. **Tidak perlu menyalin ZIP ke Hermes** dan Hermes tidak perlu akses Google Drive.
+Perintah audit memeriksa metadata dan isi kandidat dalam memori. Perintah staging terpisah menulis **source terpilih** ke folder lokal baru (tidak pernah mengekstrak seluruh arsip). Jangan memakainya untuk file di luar cakupan yang Rio berikan. **Tidak perlu menyalin ZIP ke Hermes** dan Hermes tidak perlu akses Google Drive. Kode staging belum diverifikasi di Hermes: jangan menjalankan terhadap ZIP asli sampai tes dan tinjauan keamanan selesai.
 
 ## Kriteria impor aplikasi setelah lolos audit
 
@@ -42,3 +48,10 @@ Perintah kedua hanya memeriksa metadata dan isi kandidat dalam memori. Jangan me
 - Pemrosesan lokal file sesi saat ini tidak tersedia, jadi sumber belum diimpor; bukan kegagalan ZIP atau perubahan production.
 - Hermes CI smoke test sebelumnya PASS dan idle PASS (3 unit test lama), tetapi belum melaksanakan test skrip audit baru atau build Procurement.
 - NEXT: verifikasi unit test di Hermes dalam lingkungan on-demand yang sudah disetujui, kemudian pemeriksaan ZIP sumber di runtime yang dapat mengakses file itu. Jangan mengunggah kode tanpa verifikasi.
+
+## Checkpoint lanjutan — selective staging
+- Source ZIP lengkap tidak perlu diekstrak seluruhnya: jalankan gate SHA-256 + allowlist dahulu; jika lolos, `stage_source_zip.py` dapat menyalin hanya source yang dipilih ke folder lokal baru yang privat.
+- Manifest mencatat path/bytes/hash per file **di folder lokal**, bukan dikirim ke chat maupun GitHub.
+- Unit test tambahan: `test_stage_source_zip.py` (4 kasus sintetik). **Belum dijalankan dalam sesi ini** akibat `ClientError` lingkungan pemrosesan file ChatGPT; skrip staging tidak boleh dianggap telah lolos.
+- Kandidat source review historis ±148 KB bukan bukti package cukup untuk build: periksa static assets, configs, migrations, lockfiles, schema, tests yang mungkin tersisih.
+- Selama source asli belum bisa dibaca, import code aplikasi dan build tetap BLOCKED; script ini adalah persiapan aman, bukan hasil ekstraksi.
