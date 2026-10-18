@@ -47,3 +47,13 @@ Progres source tidak disamakan dengan hosting. READY TO DEPLOY hanya jika syntax
 - Hosting Verification: NOT VERIFIED.
 - Deploy Readiness: NOT READY.
 - LOCK: NO.
+
+## Checkpoint berikutnya — 2026-10-19
+- PR #1 DRAFT: https://github.com/arioguswara-oss/gmt-procurement/pull/1
+- Last verified source SHA before checkpoint: `f1f0c6112cc7bca60282a12e25453187589fd5ad`; main baseline `e081ffcb6a92fe56b6ee6d35a454440dcb53807d`.
+- Source-review artifact dibuat lokal: `gmt-procurement-source-REVIEW-20261019.zip`, 147 file (144 original terpilih + 3 metadata/safety).
+- Review artifact SHA256: `a4ee69ab99e898068409d79c508cd7eb0b07400db9da302dd0e2b1c4b31f749d`; ZIP CRC PASS. **Bukan deploy-ready**.
+- Syntax-only parser TypeScript/TSX: 113 file PASS (0 diagnostics); belum build/full test karena dependencies dan DB test belum dipersiapkan.
+- scripts/source_guard.py dan 3 unittest: local PASS setelah fixture disesuaikan. GitHub Actions pada PR #1 berstatus FAILURE tanpa langkah job runner pada API. **CI BLOCKED — penyebab belum terverifikasi**; jangan klaim CI pass atau merge.
+- Tidak ada IMAP login, tidak ada panggilan Fonnte, tidak ada Drive write, perubahan database, ataupun hosting/deployment.
+- NEXT SAFE ACTION: verifikasi penyebab workflow gagal dari halaman GitHub Actions, lanjut audit source/seed terpisah, kemudian import source-only ke development branch setelah sanitasi dan review. Jangan merge main sampai seluruh gate sesuai.
