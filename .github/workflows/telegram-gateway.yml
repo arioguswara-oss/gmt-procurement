@@ -1,0 +1,22 @@
+name: Telegram gateway offline tests
+on:
+  pull_request:
+    paths:
+      - 'services/telegram-gateway/**'
+      - '.github/workflows/telegram-gateway.yml'
+  push:
+    paths:
+      - 'services/telegram-gateway/**'
+      - '.github/workflows/telegram-gateway.yml'
+permissions:
+  contents: read
+jobs:
+  source-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm run check && npm test
+        working-directory: services/telegram-gateway
