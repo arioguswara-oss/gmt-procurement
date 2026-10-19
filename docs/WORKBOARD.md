@@ -117,3 +117,15 @@ Progres source tidak disamakan dengan hosting. READY TO DEPLOY hanya jika syntax
 - Jika perlu menghubungkan dokumen ke App, desain ID stabil, ACL, fail-closed dan audit trail terlebih dahulu; folder dapat dibaca bukan bukti integrasi tersedia.
 - **Penyesuaian prioritas:** P2-WORKSPACE = perumusan workflow/dokumen dan permission (BLOCKED_APPROVAL untuk setiap Drive write); P2-SUPPLIER = audit existing + klasifikasi workspace/app dahulu, bukan coding otomatis. P0-IMPORT tetap IN_PROGRESS tanpa benturan lane.
 - Status: Overall Source/Foundation staged lokal, import PENDING; Module Progress belum ada implementasi baru; Source/Test syntax PASS, full build/regression PENDING; Hosting NOT VERIFIED; Deploy NOT READY; LOCK NO.
+
+
+## P2-WORKSPACE-DESIGN checkpoint — 2026-10-19
+- New PR #5 **DRAFT**: https://github.com/arioguswara-oss/gmt-procurement/pull/5; target `chatgpt/source-import-gate-20261019`. Owner ChatGPT; **DONE_SOURCE** (documentation only).
+- Ownership strictly `docs/APP_WORKSPACE_HANDOFF_CONTRACT.md`, `docs/SUPRI_WORKSPACE_PLAYBOOK.md`, `docs/DOCUMENT_ACCESS_REVIEW_20261019.md`, dan checkpoint workboard pada branch ini. P0-IMPORT branch/owner **tidak diubah**.
+- FAKTA source: `Project.gmtReference` unik, `Project.id` internal; `DocumentsService` menyimpan file ke filesystem `STORAGE_ROOT` bukan Drive; `Document` punya relasi ke project/quotation/PO; server controller menunjukkan `JwtAuthGuard`, otorisasi per-project untuk dokumen **butuh audit dan tes negatif**.
+- KEPUTUSAN Rio: AI Workspace (folder Drive authorized) untuk riset/supplier/spec/RFQ draft/komparasi kerja. Aplikasi tetap satu-satunya sumber transaksi, Mas Supri review/send, Rio approval development/deploy. Tidak ada auto-send atau spreadsheet transaksi paralel.
+- DESAIN: workflow manual dan contract stabil mengaitkan `gmtReference` + verified internal `projectId`, tanpa menyalahgunakan `Document.storagePath` sebagai URL Drive. Template SOP tersedia namun **belum diunggah ke Drive**.
+- RISIKO: potensi missing object-level/project-level authorization pada document endpoints dari static source snapshot (BELUM terverifikasi sebagai bug production). REVIEW_REQUIRED sebelum integrasi; jangan akses/test pada data production.
+- BLOCKED_APPROVAL tetap untuk fitur integrasi dan setiap Drive write. Supplier portal roadmap, jangan implement sekarang.
+- STATUS: Overall Source/Foundation source-only staging DONE_SOURCE, GitHub app import PENDING; Module Progress design Workspace DONE_SOURCE, fitur baru 0%; Source/Test static inspection, no code build/regression; Hosting NOT VERIFIED; Deploy NOT READY; LOCK NO.
+- NEXT: Rio review SOP/contract; audit per-project RBAC via scoped tests setelah source resmi diimpor; pilot dengan data fiktif tanpa Drive write; integrasi hanya setelah approval tersendiri.
