@@ -108,3 +108,12 @@ Progres source tidak disamakan dengan hosting. READY TO DEPLOY hanya jika syntax
 - Module Progress: existing modules inventoried; supplier flow functional validation and requirements acceptance remain PENDING.
 - Source/Test: 113 TS/TSX parse PASS; 333 relative imports resolution PASS; full build/integration PENDING.
 - Hosting Verification: NOT VERIFIED. Deploy Readiness: NOT READY. LOCK: NO. Next: manual security/lockfile/build planning, then source import and scoped tests.
+
+## Architecture decision from Rio — 2026-10-19: AI Workspace for Mas Supri
+- **Koreksi scope penting:** diskusi kebutuhan Mas Supri **bukan** perintah mengimplementasikan semua poin sebagai fitur aplikasi. Procurement existing tetap source of truth transaksi; Google Drive Workspace untuk riset/analisis/katalog/spesifikasi/RFQ template/draft/komparasi pendukung, AI membantu Mas Supri.
+- Rujukan klasifikasi prioritas: `docs/PROCUREMENT_FEATURE_BASELINE_AUDIT_20261019.md` (bagian `Keputusan arsitektur Rio`). Supplier Portal masih ROADMAP. Fitur supplier RFQ/approval baru **tidak boleh langsung dibangun** hanya berdasarkan adanya gap di audit source.
+- AI tidak mengirim email/WA dan tidak mengganti status transaksi otomatis. Draft email hanya dengan kontrol dan review; Mas Supri yang mengirim.
+- Google Drive tetap **READ-ONLY by default** dan hanya `Gayuh Mandala Storage Share`, ID `1Zdui1O0CEA0YvQhSQu2P7Q6Tr2hqP_0A`; ancestry per file wajib diverifikasi, dilarang akses lintas Drive. Aktivasi write/integrasi butuh instruksi eksplisit Rio.
+- Jika perlu menghubungkan dokumen ke App, desain ID stabil, ACL, fail-closed dan audit trail terlebih dahulu; folder dapat dibaca bukan bukti integrasi tersedia.
+- **Penyesuaian prioritas:** P2-WORKSPACE = perumusan workflow/dokumen dan permission (BLOCKED_APPROVAL untuk setiap Drive write); P2-SUPPLIER = audit existing + klasifikasi workspace/app dahulu, bukan coding otomatis. P0-IMPORT tetap IN_PROGRESS tanpa benturan lane.
+- Status: Overall Source/Foundation staged lokal, import PENDING; Module Progress belum ada implementasi baru; Source/Test syntax PASS, full build/regression PENDING; Hosting NOT VERIFIED; Deploy NOT READY; LOCK NO.
