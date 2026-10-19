@@ -113,6 +113,7 @@ export type DeliveryOrderItem = {
   id: string;
   purchaseOrderItemId: string;
   qtyDelivered: string | number;
+  notes?: string | null;
   purchaseOrderItem?: PurchaseOrderItem;
 };
 
