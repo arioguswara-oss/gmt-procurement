@@ -143,3 +143,14 @@ Progres source tidak disamakan dengan hosting. READY TO DEPLOY hanya jika syntax
 - PR #4 HEAD before this checkpoint `109fff3a6abcc5f5f0ceec8b355024e5910fe4c0`; combined status returned **zero CI checks**. Do NOT label GitHub CI PASS.
 - No source app import, no npm install/build, no DB usage, no Hermes actions, no Drive write or production deploy.
 - Next gated task: private repo source import via secure tool that can transfer local artifact without credentials; manual secret/privacy review remains required. 
+
+
+## P0-IMPORT dependency provenance & import-review bundle — 2026-10-19
+- Owner ChatGPT, lane `P0-IMPORT` remains **IN_PROGRESS**, source app still not in GitHub. Workboard and new docs updated on PR #4 DRAFT.
+- **FAKTA TERVERIFIKASI**: ZIP asli sha256 `25ce1448015b34144dc16a67609a61f9ad5dd7ef70fd647b401c3d22caf06813`. Internal archived `node_modules/.package-lock.json` sha256 `511861fd1a69773bf35948d076910bc8cf8a867faa8c0ae40661fe1db22696f5`: npm v3, 523 package records; all 523 `sha512` entries with `registry.npmjs.org` host; 5 `hasInstallScript` flags. Root manifest 33 direct dependencies found and basic semver-compatible. This internal lock **NOT a root package-lock** and cannot be used directly for npm ci.
+- New artifact **locally only** `GMT_Procurement_SOURCE_IMPORT_REVIEW_20261019.zip` SHA256 `2af9eca7398bc3ca40cc4dddfef27eec06dc9738b9a7600156c897ba6865abab`, 127.997 bytes, 126 source files (321.837 bytes) + 2 review metadata files. Excludes historic root README and .gitignore due to existing GitHub path conflicts, confirmed against actual PR #4 tree at `c6c86d3f...`.
+- Manifest/per-file SHA and ZIP CRC checked locally. Artifact **REVIEW ONLY, NOT DEPLOYABLE**; no email/credentials printed. Source LoginPage has prefilled email identifier; value not logged/copied to docs, requires UX/privacy review.
+- Docs created: `docs/DEPENDENCY_PROVENANCE_FROM_ORIGINAL_ZIP_20261019.md`, `docs/SOURCE_ONLY_IMPORT_HANDOFF_20261019.md`. The private code import handoff has exact ownership/scope/forbidden actions/acceptance/minimum tests.
+- **BLOCKERS:** secure transport of 126 source file bytes into GitHub Private (connector text-only; don't use public links or user secrets), manual secret/PII review, root lockfile reconciliation, isolated compile/regression, project-level auth tests, hosting verification.
+- NEXT: scoped source import when secure private transfer becomes available; no forced production changes. Hermes CI 8/8 prebuild synthetic PASS and idle PASS earlier, not evidence of full build.
+- Status: Overall Source/Foundation verified local import bundle, source GitHub import PENDING. Module Progress no new features. Source/Test static/provenance inspection, full build PENDING. Hosting NOT VERIFIED. Deploy NOT READY. LOCK NO.
