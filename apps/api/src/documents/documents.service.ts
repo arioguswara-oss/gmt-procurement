@@ -9,11 +9,12 @@ import { createHash, randomUUID } from 'crypto';
 import { createReadStream, existsSync } from 'fs';
 import { mkdir, unlink, writeFile } from 'fs/promises';
 import { extname, join, resolve } from 'path';
-import { DocumentType, ReceiptStatus } from '@prisma/client';
+import { DocumentType, ReceiptStatus, TaxDocumentStatus } from '@prisma/client';
 import { ActivityLogsService } from '../activity-logs/activity-logs.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { assertInvoicePrintable } from '../common/print/tax-invoice-print-gate';
 import { UploadDocumentDto } from './upload-document.dto';
+import { assertTaxInvoiceFile } from './tax-invoice-file-validator';
 
 const ALLOWED_EXTENSIONS = new Set([
   '.pdf', '.jpg', '.jpeg', '.png', '.xlsx', '.xls', '.msg', '.eml', '.docx', '.doc', '.zip',
@@ -96,6 +97,25 @@ export class DocumentsService {
     const project = await this.prisma.project.findUnique({ where: { id: projectId } });
     if (!project) throw new NotFoundException('Project tidak ditemukan');
     await this.assertBelongsToProject(projectId, dto);
+
+    // Apply the same Coretax rule even via generic project-document uploads.
+    if (dto.documentType === DocumentType.TAX_INVOICE) {
+      assertTaxInvoiceFile(file);
+      if (!dto.invoiceId || !dto.taxDocumentId ||
+          !/^\d+$/.test(dto.invoiceId) || !/^\d+$/.test(dto.taxDocumentId)) {
+        throw new BadRequestException('Faktur Pajak wajib terhubung ke Invoice dan record Faktur Pajak');
+      }
+      const linkedTax = await this.prisma.taxDocument.findFirst({
+        where: {
+          id: BigInt(dto.taxDocumentId),
+          invoiceId: BigInt(dto.invoiceId),
+          status: TaxDocumentStatus.UPLOADED,
+          invoice: { projectId },
+        },
+        select: { id: true },
+      });
+      if (!linkedTax) throw new BadRequestException('Relasi Faktur Pajak aktif dan Invoice tidak cocok');
+    }
 
     const extension = extname(file.originalname).toLowerCase();
     if (!ALLOWED_EXTENSIONS.has(extension)) throw new BadRequestException(`Tipe file ${extension || '(tanpa ekstensi)'} belum diizinkan`);
