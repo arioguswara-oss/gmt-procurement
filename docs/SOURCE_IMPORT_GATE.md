@@ -55,3 +55,21 @@ Perintah audit memeriksa metadata dan isi kandidat dalam memori. Perintah stagin
 - Unit test tambahan: `test_stage_source_zip.py` (4 kasus sintetik). **Belum dijalankan dalam sesi ini** akibat `ClientError` lingkungan pemrosesan file ChatGPT; skrip staging tidak boleh dianggap telah lolos.
 - Kandidat source review historis ±148 KB bukan bukti package cukup untuk build: periksa static assets, configs, migrations, lockfiles, schema, tests yang mungkin tersisih.
 - Selama source asli belum bisa dibaca, import code aplikasi dan build tetap BLOCKED; script ini adalah persiapan aman, bukan hasil ekstraksi.
+
+
+## Checkpoint terverifikasi — selective staging aktual, 2026-10-19
+
+**Evidence source:** file `gmt-procurement.zip` di lingkungan kerja lokal, diambil sebelumnya dari folder Drive yang dibatasi dan telah diverifikasi. Proses lokal read-only terhadap arsip, tanpa menjalankan source. **Tidak ada perubahan Drive/hosting**.
+
+- ZIP asli: **200.209.381 byte**; **37.761** entri; SHA-256 `25ce1448015b34144dc16a67609a61f9ad5dd7ef70fd647b401c3d22caf06813` (**MATCH** checkpoint sebelumnya); CRC test **PASS**.
+- Ekstraksi **selektif** memakai script pemeriksaan lokal independen, bukan bukti bahwa `scripts/stage_source_zip.py` yang ada di PR sudah dijalankan. File dengan symlink, path traversal, path duplikat case-insensitive, indikator credential tertentu, atau file terlalu besar akan ditolak.
+- Kandidat source: **128 file**, **322.562 byte** sebelum kompresi (93 API, 29 web, 6 root/cPanel). Source-only candidate ZIP: **128.217 byte**; SHA-256 `de2673a06b9975b722078c825a72c8c9d68e4e1edb5fffa3133d599bea38bbe5`; ZIP CRC **PASS**; dilengkapi review manifest per-file.
+- TypeScript global parser (syntax-only) telah membaca **113 berkas .ts/.tsx: 0 parse diagnostics**. Pemeriksaan resolusi path import relatif **333 referensi: 0 missing**.
+- Prisma: **24 deklarasi model**; **20 file module** dan **16 file controller** di source. Ini bukan bukti fungsi/role/tenant isolation benar.
+- **Kendala build**: tidak ditemukan root lockfile `package-lock.json`, `pnpm-lock.yaml`, maupun `yarn.lock`. Tidak ada tes `npm install`, build, e2e, database, atau deployment.
+- `apps/api/prisma/seed.ts`, patch historis, `node_modules`, log, upload, storage, `.env*`, dan artefak build tidak diikutkan dalam kandidat. Seed/migration harus diperlakukan terpisah dan tidak boleh dijalankan pada production.
+- Pemeriksaan indikator secret pada kandidat **0 temuan dalam pola terbatas**; belum merupakan clearance terhadap semua rahasia atau data pribadi. Manual review masih diwajibkan.
+- Kandidat berada **hanya di sandbox lokal**, **belum diimpor** ke branch GitHub. Jangan menyebut source production sudah tersinkronisasi.
+- Laporan status: Source/Foundation = selective staging selesai, source import belum; Module = audit eksisting, implementasi baru belum; Source/Test = syntax-only PASS, build/regression PENDING; Hosting = NOT VERIFIED; Deploy = NOT READY; LOCK = NO.
+- **NEXT:** manual security/completeness review dan strategi lockfile; baru impor source-only pada branch khusus dan uji build secara aman setelah dependency preflight. Tidak ada merge/deploy/migration otomatis.
+
