@@ -164,3 +164,12 @@ Progres source tidak disamakan dengan hosting. READY TO DEPLOY hanya jika syntax
 - **Still pending:** 66 larger source files (291.318 bytes), notably Prisma schema and main services/frontend features. Do NOT attempt install/build/deploy on incomplete tree; no app regression/CI attempted. Root lockfile missing in original baseline.
 - Source/Foundation: 60/126 **actual imported**, remaining 66 PENDING; Module: existing unchanged, no new business features; Source/Test: 60-file blob identity check PASS, full build/regression PENDING; Hosting NOT VERIFIED; Deploy NOT READY; LOCK NO.
 - NEXT: finish exact remaining 66 source imports from original locally verified package with secure file transfer, verify 126/126 Git tree hashes; only after full import, reconcile dependency lockfile and design isolated build.
+
+
+## P0-IMPORT completion and local build — 2026-10-19
+- Owner Codex; import DONE_SOURCE under Rio continuation mandate. SHA f0ad54ef5484f64d9be1609515c7cac841650a90; 126/126 exact source blobs, remaining 0; other lanes unchanged.
+- Root lock generated; npm ci ignore-scripts, API/web typecheck/build, 17 Python gate and 10 DB-free regression tests PASS.
+- Evidence: docs/SOURCE_IMPORT_BUILD_EVIDENCE_20261019.md and source manifest. Old review bundle unavailable; reconstructed directly from verified original ZIP.
+- Blockers: dependency audit 11 high + 1 moderate; remote CI failed without logs; Hermes gmtci CPU/RAM limits unlimited, no heavy VPS build.
+- Overall Source/Foundation: import DONE_SOURCE; Module: unchanged baseline; Source/Test: local PASS, remote/security open; Hosting NOT VERIFIED; Deploy NOT READY; LOCK NO.
+- Next: dependency remediation review, dedicated gmtci resource limits and isolated Linux build. No SANRO environment, merge/deploy/migration/seed/db push.

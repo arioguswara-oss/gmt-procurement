@@ -1,0 +1,121 @@
+{
+  "date": "2026-10-19",
+  "counts": {
+    "info": 0,
+    "low": 0,
+    "moderate": 1,
+    "high": 11,
+    "critical": 0,
+    "total": 12
+  },
+  "findings": [
+    {
+      "name": "@prisma/adapter-mariadb",
+      "severity": "moderate",
+      "fixAvailable": {
+        "name": "@prisma/adapter-mariadb",
+        "version": "7.10.1",
+        "isSemVerMajor": true
+      }
+    },
+    {
+      "name": "@prisma/config",
+      "severity": "high",
+      "fixAvailable": {
+        "name": "prisma",
+        "version": "7.10.1",
+        "isSemVerMajor": true
+      }
+    },
+    {
+      "name": "@puppeteer/browsers",
+      "severity": "high",
+      "fixAvailable": {
+        "name": "puppeteer-core",
+        "version": "25.14.0",
+        "isSemVerMajor": true
+      }
+    },
+    {
+      "name": "basic-ftp",
+      "severity": "high",
+      "fixAvailable": {
+        "name": "puppeteer-core",
+        "version": "25.14.0",
+        "isSemVerMajor": true
+      }
+    },
+    {
+      "name": "deepmerge-ts",
+      "severity": "high",
+      "fixAvailable": {
+        "name": "prisma",
+        "version": "7.10.1",
+        "isSemVerMajor": true
+      }
+    },
+    {
+      "name": "extract-zip",
+      "severity": "high",
+      "fixAvailable": {
+        "name": "puppeteer-core",
+        "version": "25.14.0",
+        "isSemVerMajor": true
+      }
+    },
+    {
+      "name": "get-uri",
+      "severity": "high",
+      "fixAvailable": {
+        "name": "puppeteer-core",
+        "version": "25.14.0",
+        "isSemVerMajor": true
+      }
+    },
+    {
+      "name": "mariadb",
+      "severity": "high",
+      "fixAvailable": {
+        "name": "@prisma/adapter-mariadb",
+        "version": "7.10.1",
+        "isSemVerMajor": true
+      }
+    },
+    {
+      "name": "pac-proxy-agent",
+      "severity": "high",
+      "fixAvailable": {
+        "name": "puppeteer-core",
+        "version": "25.14.0",
+        "isSemVerMajor": true
+      }
+    },
+    {
+      "name": "prisma",
+      "severity": "high",
+      "fixAvailable": {
+        "name": "prisma",
+        "version": "7.10.1",
+        "isSemVerMajor": true
+      }
+    },
+    {
+      "name": "proxy-agent",
+      "severity": "high",
+      "fixAvailable": {
+        "name": "puppeteer-core",
+        "version": "25.14.0",
+        "isSemVerMajor": true
+      }
+    },
+    {
+      "name": "puppeteer-core",
+      "severity": "high",
+      "fixAvailable": {
+        "name": "puppeteer-core",
+        "version": "25.14.0",
+        "isSemVerMajor": true
+      }
+    }
+  ]
+}
