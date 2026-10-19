@@ -125,3 +125,14 @@ Progres source tidak disamakan dengan hosting. READY TO DEPLOY hanya jika syntax
 - Tidak ditemukan root dependency lockfile; jangan menjalankan `npm install` tak terkontrol, mengasumsikan build reproduksibel, atau memakai production DB. Tes build/regression masih PENDING.
 - GitHub source import tetap PENDING manual security/completeness; PR #4 tetap DRAFT, tidak ada deployment.
 - Status: Overall Source/Foundation source-only staged / import PENDING; Module Progress static audit; Source/Test syntax PASS, build PENDING; Hosting NOT VERIFIED; Deploy NOT READY; LOCK NO.
+
+
+## P0-IMPORT checkpoint — candidate verification 2026-10-19
+- Latest checkpoint details: `docs/SOURCE_CANDIDATE_VERIFICATION_20261019.md`. New code: `scripts/verify_source_candidate.py`, `scripts/test_verify_source_candidate.py` (same branch; PR #4 DRAFT).
+- **FAKTA TERVERIFIKASI** original ZIP SHA-256 unchanged (`25ce1448015b34144dc16a67609a61f9ad5dd7ef70fd647b401c3d22caf06813`); 37,761 entries; CRC PASS. Source candidate ZIP SHA-256 `de2673a06b9975b722078c825a72c8c9d68e4e1edb5fffa3133d599bea38bbe5`, 128 source files / 322,562 bytes.
+- **128/128 staged source files byte-identical** to original ZIP; manifest SHA/size per file MATCH; local content gate result `REVIEW_REQUIRED` with 0 findings. Only heuristics; manual secret/privacy review still needed.
+- Added six synthetic candidate verifier unit tests: **6/6 PASS locally** and compared GitHub blobs SHA to same locally tested bytes; source executable code from archive itself NOT run.
+- **NOT DONE**: 128 files app source are **not yet uploaded into GitHub**; dependency lock missing, full Nest/Vite build, regression, RBAC negative tests and hosting comparison all PENDING. Connector transfer of local source package requires another secure authorized path; no credential must be exposed.
+- P0-IMPORT lane remains **IN_PROGRESS**; no change to PR #5 docs-only Workspace lane, Telegram lane, Hermes server, SANRO or production.
+- Next: manual privacy/secret & import completeness review; secure private repo source import on dedicated branch; isolated build after dependency gating.
+- Reporting: Overall Source/Foundation candidate verification DONE_SOURCE, import PENDING; Module Progress no new feature; Source/Test candidate gate 6/6 PASS local, build/regression PENDING; Hosting NOT VERIFIED; Deploy NOT READY; LOCK NO.
