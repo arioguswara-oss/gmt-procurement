@@ -227,6 +227,15 @@ export class QuotationsService {
 
     const calculated = this.calculate(dto, current);
     const result = await this.prisma.$transaction(async (tx) => {
+      // Serialize a draft edit against concurrent Mark Sent/revision changes.
+      // This conditional write acquires the row lock before touching child items.
+      const claimed = await tx.quotation.updateMany({
+        where: { id, status: QuotationStatus.DRAFT },
+        data: { updatedById: userId },
+      });
+      if (claimed.count !== 1) {
+        throw new BadRequestException('Quotation sudah dikirim/final; perubahan draft ditolak. Gunakan revisi.');
+      }
       if (dto.items) {
         await tx.quotationItem.deleteMany({ where: { quotationId: id } });
       }
