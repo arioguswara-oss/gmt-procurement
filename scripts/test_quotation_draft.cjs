@@ -34,7 +34,10 @@ test('DRAFT quotation PATCH updates existing item notes and totals without creat
     quotation: { findUnique: async () => quote() },
     $transaction: async (fn) => fn({
       quotationItem: { deleteMany: async ({ where }) => { assert.equal(where.quotationId, 11n); deleted = true; } },
-      quotation: { update: async ({ where, data }) => { assert.equal(where.id, 11n); payload = data; return { ...quote(), ...data }; } },
+      quotation: {
+        updateMany: async ({ where }) => { assert.equal(where.id, 11n); assert.equal(where.status, 'DRAFT'); return { count: 1 }; },
+        update: async ({ where, data }) => { assert.equal(where.id, 11n); payload = data; return { ...quote(), ...data }; },
+      },
     }),
   }, { write: async ({ action }) => { assert.equal(action, 'UPDATED'); audit = true; } });
   const updated = await service.update(11n, {
@@ -63,4 +66,24 @@ test('Quotation A4 renders and HTML-escapes notes belonging to each item', async
   assert.match(html, /Certificate B &lt;item&gt;/);
   assert.doesNotMatch(html, /Certificate B <item>/);
   assert.match(html, /Valid Until/);
+});
+
+test('concurrent Mark Sent rejects PATCH inside transaction before item deletion', async () => {
+  let deleted = false, updated = false, audit = false;
+  const service = new QuotationsService({
+    quotation: { findUnique: async () => quote('DRAFT') }, // stale read before a concurrent send
+    $transaction: async (fn) => fn({
+      quotation: {
+        updateMany: async ({ where }) => { assert.equal(where.status, 'DRAFT'); return { count: 0 }; },
+        update: async () => { updated = true; throw Error('must not update SENT'); },
+      },
+      quotationItem: { deleteMany: async () => { deleted = true; throw Error('must not delete SENT items'); } },
+    }),
+  }, { write: () => { audit = true; } });
+  await assert.rejects(service.update(11n, {
+    items: [{ description: 'Illegal replacement', qty: 1, uom: 'EA', unitPrice: 100 }],
+  }, 5n), { status: 400 });
+  assert.equal(deleted, false);
+  assert.equal(updated, false);
+  assert.equal(audit, false);
 });
