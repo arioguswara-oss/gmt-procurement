@@ -274,6 +274,7 @@ export class DeliveryOrdersService {
         uom: item.uom,
         previouslyDelivered: previous,
         thisDelivery: thisDo,
+        notes: currentLine?.notes ?? null,
         balanceAfterThisDo: item.qtyOrdered.minus(previous).minus(thisDo),
         marked: thisDo.greaterThan(0),
       };
