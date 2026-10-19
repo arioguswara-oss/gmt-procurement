@@ -7,6 +7,7 @@ require('reflect-metadata');
 const { DocumentType } = require('@prisma/client');
 const { assertTaxInvoiceFile } = require('../apps/api/dist/documents/tax-invoice-file-validator');
 const { DocumentsService } = require('../apps/api/dist/documents/documents.service');
+const { TaxDocumentsService } = require('../apps/api/dist/tax-documents/tax-documents.service');
 
 const pdf = Buffer.from('%PDF-1.7\nmock content');
 const png = Buffer.from('89504e470d0a1a0a00000000', 'hex');
@@ -54,4 +55,48 @@ test('generic project upload rejects mismatched active tax-invoice relationship 
     documentType: DocumentType.TAX_INVOICE, invoiceId: '9', taxDocumentId: '2',
   }, file('scan.pdf', pdf), 1n), { status: 400 });
   assert.equal(linkedCheck, 1);
+});
+
+test('READY_TO_FINALIZE allows replacing an existing Coretax before Invoice FINAL', async () => {
+  let stored = false, superseded = false, invoiceKeptReady = false, audited = false;
+  const prisma = {
+    invoice: { findUnique: async ({ where }) => {
+      assert.equal(where.id, 9n);
+      return { id: 9n, projectId: 3n, invoiceNo: 'INV-TEST', status: 'READY_TO_FINALIZE', project: { id: 3n } };
+    } },
+    taxDocument: {
+      create: async ({ data }) => {
+        assert.equal(data.invoiceId, 9n);
+        return { id: 6n, status: 'UPLOADED' };
+      },
+      findUnique: async () => ({ id: 6n, status: 'UPLOADED', documents: [{ id: 7n }] }),
+      delete: async () => assert.fail('No cleanup should be needed'),
+    },
+    $transaction: async fn => fn({
+      taxDocument: { updateMany: async ({ where, data }) => {
+        assert.equal(where.invoiceId, 9n);
+        assert.equal(where.id.not, 6n);
+        assert.equal(data.status, 'REPLACED');
+        superseded = true;
+      } },
+      invoice: { update: async ({ where, data }) => {
+        assert.equal(where.id, 9n);
+        assert.equal(data.status, 'READY_TO_FINALIZE');
+        invoiceKeptReady = true;
+      } },
+    }),
+  };
+  const docs = { upload: async (_projectId, dto, theFile) => {
+    assert.equal(dto.invoiceId, '9');
+    assert.equal(dto.taxDocumentId, '6');
+    assert.equal(theFile.originalname, 'replacement.pdf');
+    stored = true;
+    return { id: 7n };
+  } };
+  const service = new TaxDocumentsService(prisma, docs, {
+    write: async ({ action }) => { assert.equal(action, 'UPLOADED'); audited = true; },
+  });
+  const result = await service.upload(9n, {}, file('replacement.pdf', pdf), 2n);
+  assert.equal(result.taxDocument.status, 'UPLOADED');
+  assert.equal(stored && superseded && invoiceKeptReady && audited, true);
 });
