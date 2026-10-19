@@ -28,7 +28,7 @@ export class QuotationItemInputDto {
 
 export class CreateQuotationDto {
   @IsDateString() quotationDate: string;
-  @IsOptional() @IsDateString() validUntil?: string;
+  @IsOptional() @IsDateString() validUntil?: string | null;
   @IsOptional() @IsString() @MaxLength(190) rfqNo?: string;
   @IsOptional() @IsString() customerContactId?: string;
   @IsOptional() @IsString() @MaxLength(500) subject?: string;

@@ -244,7 +244,7 @@ export class QuotationsService {
         where: { id },
         data: {
           quotationDate: dto.quotationDate ? new Date(dto.quotationDate) : undefined,
-          validUntil: dto.validUntil ? new Date(dto.validUntil) : undefined,
+          validUntil: dto.validUntil === null ? null : dto.validUntil ? new Date(dto.validUntil) : undefined,
           rfqNo: dto.rfqNo,
           customerContactId,
           subject: dto.subject,
