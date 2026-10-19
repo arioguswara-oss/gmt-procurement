@@ -1,0 +1,59 @@
+import { FormEvent, useMemo, useState } from 'react';
+import { Card, EmptyState, ErrorBox, SuccessBox } from '../../components/Ui';
+import { StatusBadge } from '../../components/StatusBadge';
+import { api, downloadProtected, openProtectedHtml, upload } from '../../lib/api';
+import { formatDate, formatMoney, humanize, todayInput } from '../../lib/format';
+import type { Invoice, Payment } from '../../types';
+import type { WorkspaceData } from './useProjectWorkspace';
+
+function safeName(value:string){return value.replace(/[^A-Za-z0-9._-]+/g,'_')}
+function paidAmount(invoice:Invoice){return (invoice.payments||[]).reduce((sum,p)=>sum+Number(p.amount||0),0)}
+
+export function BillingTab({data,reload}:{data:WorkspaceData;reload:()=>Promise<void>}){
+ const [error,setError]=useState('');const [success,setSuccess]=useState('');
+ const [show,setShow]=useState(false);const [poId,setPoId]=useState(data.purchaseOrders[0]?.id||'');const [invoiceDate,setInvoiceDate]=useState(todayInput());const [selected,setSelected]=useState<string[]>([]);const [taxRate,setTaxRate]=useState('');
+ const [paymentInvoiceId,setPaymentInvoiceId]=useState('');const [paymentDate,setPaymentDate]=useState(todayInput());const [paymentAmount,setPaymentAmount]=useState('');const [paymentMethod,setPaymentMethod]=useState('BANK_TRANSFER');const [paymentRef,setPaymentRef]=useState('');const [paymentNotes,setPaymentNotes]=useState('');
+ const received=useMemo(()=>data.deliveryOrders.filter(d=>d.purchaseOrderId===poId&&d.status==='RECEIVED'),[data.deliveryOrders,poId]);
+
+ function clearMessages(){setError('');setSuccess('')}
+ async function makeInvoice(e:FormEvent){e.preventDefault();clearMessages();try{await api(`/purchase-orders/${poId}/invoices`,{method:'POST',body:JSON.stringify({invoiceDate,deliveryOrderIds:selected,taxRate:taxRate?Number(taxRate):undefined})});setShow(false);setSelected([]);setSuccess('Draft Invoice berhasil dibuat.');await reload();}catch(e){setError(e instanceof Error?e.message:'Gagal');}}
+ async function action(id:string,name:string,message?:string){clearMessages();try{await api(`/invoices/${id}/${name}`,{method:'POST'});setSuccess(message||'Invoice diperbarui.');await reload();}catch(e){setError(e instanceof Error?e.message:'Gagal');}}
+ async function taxUpload(invoiceId:string,file:File){clearMessages();try{const f=new FormData();f.append('file',file);await upload(`/invoices/${invoiceId}/tax-documents`,f);setSuccess('Faktur Pajak Coretax berhasil diupload.');await reload();}catch(e){setError(e instanceof Error?e.message:'Upload gagal');}}
+ async function createReceipt(invoiceId:string){clearMessages();try{await api(`/invoices/${invoiceId}/receipt`,{method:'POST',body:JSON.stringify({receiptDate:todayInput()})});setSuccess('Draft Kwitansi berhasil dibuat. Review lalu finalize.');await reload();}catch(e){setError(e instanceof Error?e.message:'Gagal');}}
+ async function finalizeReceipt(receiptId:string){clearMessages();try{await api(`/receipts/${receiptId}/finalize`,{method:'POST'});setSuccess('Kwitansi sudah FINAL.');await reload();}catch(e){setError(e instanceof Error?e.message:'Gagal finalize kwitansi');}}
+ async function archive(path:string,message:string){clearMessages();try{await api(path,{method:'POST'});setSuccess(message);await reload();}catch(e){setError(e instanceof Error?e.message:'Gagal membuat arsip PDF');}}
+ function openPayment(invoice:Invoice){const outstanding=Math.max(0,Number(invoice.grandTotal)-paidAmount(invoice));setPaymentInvoiceId(invoice.id);setPaymentDate(todayInput());setPaymentAmount(outstanding.toFixed(2));setPaymentMethod('BANK_TRANSFER');setPaymentRef('');setPaymentNotes('');}
+ async function createPayment(e:FormEvent){e.preventDefault();clearMessages();try{await api(`/invoices/${paymentInvoiceId}/payments`,{method:'POST',body:JSON.stringify({paymentDate,amount:Number(paymentAmount),paymentMethod,referenceNo:paymentRef||undefined,notes:paymentNotes||undefined})});setPaymentInvoiceId('');setSuccess('Payment berhasil dicatat.');await reload();}catch(e){setError(e instanceof Error?e.message:'Gagal mencatat payment');}}
+ async function uploadPaymentProof(payment:Payment,file:File){clearMessages();try{const f=new FormData();f.append('file',file);f.append('documentType','PAYMENT_PROOF');f.append('paymentId',payment.id);await upload(`/projects/${data.project.id}/documents`,f);setSuccess('Bukti pembayaran berhasil diupload.');await reload();}catch(e){setError(e instanceof Error?e.message:'Upload bukti pembayaran gagal');}}
+
+ return <div className="tab-stack"><ErrorBox error={error}/><SuccessBox message={success}/>
+  {data.invoices.map(inv=>{const paid=paidAmount(inv);const outstanding=Math.max(0,Number(inv.grandTotal)-paid);const receipt=inv.receipt;return <Card key={inv.id}>
+   <div className="document-row"><div><strong>{inv.invoiceNo}</strong><span>{formatDate(inv.invoiceDate)} · {formatMoney(inv.grandTotal,inv.currency)}</span></div><StatusBadge status={inv.status}/><div className="row-actions">
+    <button className="btn small" onClick={()=>openProtectedHtml(`/invoices/${inv.id}/print-preview`)}>Preview A4</button>
+    <button className="btn small" onClick={()=>downloadProtected(`/invoices/${inv.id}/pdf`,`${safeName(inv.invoiceNo)}.pdf`)}>Download PDF</button>
+    {inv.status==='DRAFT'&&<button className="btn primary small" onClick={()=>action(inv.id,'submit-for-tax','Invoice dikunci dan menunggu Faktur Pajak.')}>Submit for Tax</button>}
+    {inv.status==='WAITING_TAX_INVOICE'&&<label className="btn small file-btn">Upload Faktur Pajak<input type="file" accept="application/pdf,image/*" onChange={e=>e.target.files?.[0]&&taxUpload(inv.id,e.target.files[0])}/></label>}
+    {inv.status==='READY_TO_FINALIZE'&&<button className="btn primary small" onClick={()=>action(inv.id,'finalize','Invoice sudah FINAL.')}>Finalize Invoice</button>}
+    {inv.status==='FINAL'&&<button className="btn small" onClick={()=>archive(`/invoices/${inv.id}/archive-pdf`,'PDF Invoice FINAL disimpan ke Documents.')}>Archive Invoice PDF</button>}
+   </div></div>
+   <div className="billing-summary"><div><span>Tax</span><strong>{formatMoney(inv.taxAmount,inv.currency)}</strong></div><div><span>Paid</span><strong>{formatMoney(paid,inv.currency)}</strong></div><div><span>Outstanding</span><strong>{formatMoney(outstanding,inv.currency)}</strong></div><div><span>Payment Status</span><strong>{outstanding<=0?'PAID':paid>0?'PARTIALLY PAID':'UNPAID'}</strong></div></div>
+   {inv.taxDocuments?.length?<div className="subsection-line"><span>Faktur Pajak</span><strong>{inv.taxDocuments.filter(t=>t.status!=='CANCELLED').length} file/record aktif</strong></div>:null}
+
+   {inv.status==='FINAL'&&<div className="billing-section"><div className="billing-section-head"><strong>Kwitansi</strong>{!receipt&&<button className="btn small" onClick={()=>createReceipt(inv.id)}>+ Buat Kwitansi</button>}</div>
+    {receipt?<div className="receipt-box"><div><strong>{receipt.receiptNo}</strong><span>{formatDate(receipt.receiptDate)} · {formatMoney(receipt.amount,inv.currency)}</span></div><StatusBadge status={receipt.status}/><div className="row-actions"><button className="btn small" onClick={()=>openProtectedHtml(`/receipts/${receipt.id}/print-preview`)}>Preview</button><button className="btn small" onClick={()=>downloadProtected(`/receipts/${receipt.id}/pdf`,`${safeName(receipt.receiptNo)}.pdf`)}>Download PDF</button>{receipt.status==='DRAFT'&&<button className="btn primary small" onClick={()=>finalizeReceipt(receipt.id)}>Finalize Kwitansi</button>}{receipt.status==='FINAL'&&<button className="btn small" onClick={()=>archive(`/receipts/${receipt.id}/archive-pdf`,'PDF Kwitansi FINAL disimpan ke Documents.')}>Archive PDF</button>}</div></div>:<p className="muted">Kwitansi belum dibuat.</p>}
+   </div>}
+
+   {inv.status==='FINAL'&&<div className="billing-section"><div className="billing-section-head"><strong>Payment</strong>{outstanding>0&&<button className="btn small" onClick={()=>openPayment(inv)}>+ Catat Payment</button>}</div>
+    {(inv.payments||[]).length?<div className="payment-list">{(inv.payments||[]).map(p=><div className="payment-row" key={p.id}><div><strong>{formatMoney(p.amount,inv.currency)}</strong><span>{formatDate(p.paymentDate)} · {humanize(p.paymentMethod)}{p.referenceNo?` · ${p.referenceNo}`:''}</span></div><div className="row-actions"><span className="muted">{p.documents?.some(d=>d.documentType==='PAYMENT_PROOF')?'Bukti ✓':'Belum ada bukti'}</span><label className="btn small file-btn">Upload Bukti<input type="file" accept="application/pdf,image/*" onChange={e=>e.target.files?.[0]&&uploadPaymentProof(p,e.target.files[0])}/></label></div></div>)}</div>:<p className="muted">Belum ada pembayaran tercatat.</p>}
+   </div>}
+
+   {inv.status==='FINAL'&&receipt?.status==='FINAL'&&<div className="billing-section package-section"><div><strong>Billing Package</strong><span>Invoice + Customer PO + Signed DO/Receiving + Faktur Pajak + Kwitansi</span></div><div className="row-actions"><button className="btn primary small" onClick={()=>downloadProtected(`/invoices/${inv.id}/billing-package.pdf`,`${safeName(inv.invoiceNo)}_Billing_Package.pdf`)}>Download Paket PDF</button><button className="btn small" onClick={()=>archive(`/invoices/${inv.id}/archive-billing-package`,'Billing Package disimpan ke Documents.')}>Archive Package</button></div></div>}
+  </Card>})}
+
+  {paymentInvoiceId&&<Card title="Catat Payment"><form className="form-stack" onSubmit={createPayment}><div className="form-grid four"><label>Payment Date<input type="date" value={paymentDate} onChange={e=>setPaymentDate(e.target.value)} required/></label><label>Amount<input type="number" min="0.01" step="0.01" value={paymentAmount} onChange={e=>setPaymentAmount(e.target.value)} required/></label><label>Method<select value={paymentMethod} onChange={e=>setPaymentMethod(e.target.value)}><option value="BANK_TRANSFER">Bank Transfer</option><option value="CASH">Cash</option><option value="GIRO">Giro</option><option value="OTHER">Other</option></select></label><label>Reference No.<input value={paymentRef} onChange={e=>setPaymentRef(e.target.value)}/></label></div><label>Notes<textarea rows={2} value={paymentNotes} onChange={e=>setPaymentNotes(e.target.value)}/></label><div className="form-actions"><button type="button" className="btn" onClick={()=>setPaymentInvoiceId('')}>Batal</button><button className="btn primary">Save Payment</button></div></form></Card>}
+
+  {!show&&<button className="btn primary self-start" onClick={()=>setShow(true)}>+ Draft Invoice</button>}
+  {!data.invoices.length&&!show&&<EmptyState title="Belum ada Invoice" text="Invoice hanya mengambil Delivery Order yang sudah RECEIVED."/>}
+  {show&&<Card title="Create Draft Invoice"><form className="form-stack" onSubmit={makeInvoice}><div className="form-grid three"><label>Purchase Order<select value={poId} onChange={e=>{setPoId(e.target.value);setSelected([])}}>{data.purchaseOrders.map(p=><option value={p.id} key={p.id}>{p.poNo}</option>)}</select></label><label>Invoice Date<input type="date" value={invoiceDate} onChange={e=>setInvoiceDate(e.target.value)} required/></label><label>Tax Rate %<input type="number" step="0.0001" value={taxRate} onChange={e=>setTaxRate(e.target.value)}/></label></div><div><strong>Pilih Received DO</strong>{received.length?received.map(d=><label className="select-row" key={d.id}><input type="checkbox" checked={selected.includes(d.id)} onChange={e=>setSelected(e.target.checked?[...selected,d.id]:selected.filter(x=>x!==d.id))}/><span>{d.doNo}</span><small>{formatDate(d.doDate)}</small></label>):<p className="muted">Belum ada DO berstatus RECEIVED untuk PO ini.</p>}</div><div className="form-actions"><button type="button" className="btn" onClick={()=>setShow(false)}>Batal</button><button className="btn primary" disabled={!selected.length}>Create Draft Invoice</button></div></form></Card>}
+ </div>;
+}
