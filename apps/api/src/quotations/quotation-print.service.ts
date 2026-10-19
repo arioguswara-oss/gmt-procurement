@@ -57,7 +57,7 @@ export class QuotationPrintService {
     const itemRows = q.items.map((item) => `
       <tr>
         <td class="c">${item.lineNo}</td>
-        <td class="description">${this.esc(item.description)}</td>
+        <td class="description">${this.esc(item.description)}${item.notes ? `<div class="item-note"><strong>Note:</strong> ${this.esc(item.notes)}</div>` : ""}</td>
         <td class="r">${this.esc(item.qty.toString())}</td>
         <td class="c">${this.esc(item.uom)}</td>
         <td class="r">${this.esc(this.number(item.unitPrice, q.currency))}</td>
@@ -96,6 +96,7 @@ export class QuotationPrintService {
   th, td { border:1px solid #777; padding:2.2mm; vertical-align:top; }
   th { background:#efefef; text-align:center; font-size:9.5pt; }
   td.description { white-space:pre-wrap; line-height:1.35; }
+  .item-note { margin-top:2mm; color:#334155; font-size:9pt; white-space:pre-wrap; }
   .c { text-align:center; } .r { text-align:right; white-space:nowrap; }
   .bottom { display:grid; grid-template-columns:1.4fr .8fr; gap:5mm; margin-top:5mm; }
   .notes { border:1px solid #aaa; padding:3mm; min-height:42mm; }

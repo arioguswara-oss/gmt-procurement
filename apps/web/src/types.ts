@@ -60,6 +60,7 @@ export type Quotation = {
   subject?: string | null;
   currency: string;
   subtotal: string | number;
+  discountRate?: string | number | null;
   discountAmount: string | number;
   taxRate?: string | number | null;
   taxBase: string | number;
