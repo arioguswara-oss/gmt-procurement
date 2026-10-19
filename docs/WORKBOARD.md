@@ -75,3 +75,9 @@ Progres source tidak disamakan dengan hosting. READY TO DEPLOY hanya jika syntax
 - Lane status **DONE_SOURCE** (script/tests and observed CI gate PASS); still **full app build BLOCKED**, source not yet imported, root dependency lockfile missing. Resource limits not validated; after-run process listing not repeated for this exact test.
 - Source/Test: prebuild scanner 8/8 Hermes PASS, full build/regression PENDING. Overall source candidate local, import pending; modules no new implementation; hosting NOT VERIFIED; deploy NOT READY; LOCK NO.
 - NEXT: source import preflight/manual secret review and dependency lockfile strategy, then scoped build only after isolation requirements are met.
+
+## HERMES-CI-PREBUILD idle validation — 2026-10-19 11:12 WIB
+- Screenshot SSH Rio menunjukkan `ps -u gmtci -o pid,comm,%cpu,%mem` hanya menghasilkan header kolom tanpa baris proses. **Zero processes under gmtci at sampling instant** after eight prebuild unit tests passed.
+- Checkpoint applies to this second test; prior idle check for CI runner was separate. No daemon/cron was enabled, no production/SANRO access or deployment.
+- Status lane: DONE_SOURCE; synthetic tests Hermes 8/8 PASS; idle observation PASS; **full application build still BLOCKED** by missing source import and dependency lockfile. Resource/cgroup limits and hosting validation still PENDING.
+- Overall Source/Foundation source candidate staged, GitHub app source import PENDING; Module Progress no new features; Source/Test prebuild gate PASS, full build PENDING; Hosting NOT VERIFIED; Deploy NOT READY; LOCK NO.
