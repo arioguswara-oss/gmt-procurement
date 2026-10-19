@@ -9,9 +9,10 @@ import { createHash, randomUUID } from 'crypto';
 import { createReadStream, existsSync } from 'fs';
 import { mkdir, unlink, writeFile } from 'fs/promises';
 import { extname, join, resolve } from 'path';
-import { DocumentType } from '@prisma/client';
+import { DocumentType, ReceiptStatus } from '@prisma/client';
 import { ActivityLogsService } from '../activity-logs/activity-logs.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { assertInvoicePrintable } from '../common/print/tax-invoice-print-gate';
 import { UploadDocumentDto } from './upload-document.dto';
 
 const ALLOWED_EXTENSIONS = new Set([
@@ -224,6 +225,35 @@ export class DocumentsService {
   async download(id: bigint) {
     const document = await this.prisma.document.findUnique({ where: { id } });
     if (!document) throw new NotFoundException('Dokumen tidak ditemukan');
+
+    // Archived PDFs must not bypass the mandatory Coretax gate enforced by
+    // the live Invoice/Kwitansi render and PDF routes.
+    if (document.documentType === DocumentType.INVOICE_PDF ||
+        document.documentType === DocumentType.RECEIPT_PDF ||
+        document.documentType === DocumentType.BILLING_PACKAGE_PDF) {
+      if (!document.invoiceId) {
+        throw new BadRequestException('Arsip tagihan tidak terhubung ke Invoice yang sah');
+      }
+      const invoice = await this.prisma.invoice.findUnique({
+        where: { id: document.invoiceId },
+        include: { taxDocuments: { include: { documents: true } } },
+      });
+      if (!invoice || invoice.projectId !== document.projectId) {
+        throw new BadRequestException('Arsip tagihan tidak terhubung ke Invoice project ini');
+      }
+      assertInvoicePrintable(invoice);
+      if (document.documentType === DocumentType.RECEIPT_PDF) {
+        if (!document.receiptId) throw new BadRequestException('Arsip Kwitansi tidak terhubung ke Kwitansi FINAL');
+        const receipt = await this.prisma.receipt.findUnique({
+          where: { id: document.receiptId },
+          select: { invoiceId: true, status: true },
+        });
+        if (!receipt || receipt.invoiceId !== invoice.id || receipt.status !== ReceiptStatus.FINAL) {
+          throw new BadRequestException('Hanya arsip Kwitansi FINAL yang terhubung ke Invoice ini boleh diunduh');
+        }
+      }
+    }
+
     if (!existsSync(document.storagePath)) throw new NotFoundException('File fisik tidak ditemukan di storage');
 
     return {
