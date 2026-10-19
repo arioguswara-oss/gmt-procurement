@@ -6,6 +6,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { ReceiptPrintService } from '../receipts/receipt-print.service';
 import { InvoicePrintService } from './invoice-print.service';
 import { InvoicesService } from './invoices.service';
+import { assertInvoicePrintable } from '../common/print/tax-invoice-print-gate';
 
 @Injectable()
 export class BillingPackagePdfService {
@@ -36,6 +37,7 @@ export class BillingPackagePdfService {
   async build(invoiceId: bigint) {
     const row = await this.invoices.get(invoiceId);
     if (row.status !== InvoiceStatus.FINAL) throw new BadRequestException('Billing Package hanya dapat dibuat dari Invoice FINAL');
+    assertInvoicePrintable(row);
 
     const requireReceipt = await this.settingBoolean('BILLING_PACKAGE_REQUIRE_RECEIPT', true);
     if (requireReceipt && (!row.receipt || row.receipt.status !== ReceiptStatus.FINAL)) {
@@ -54,10 +56,9 @@ export class BillingPackagePdfService {
     if (!receivingDocs.length) throw new BadRequestException('Signed DO / Receiving Evidence belum tersedia');
 
     const taxDocs = this.uniqueDocuments(row.taxDocuments.flatMap((tax) =>
-      tax.status === TaxDocumentStatus.CANCELLED ? [] : tax.documents.filter((doc) => doc.documentType === DocumentType.TAX_INVOICE),
+      tax.status !== TaxDocumentStatus.UPLOADED ? [] : tax.documents.filter((doc) => doc.documentType === DocumentType.TAX_INVOICE),
     ));
-    const requireTax = await this.settingBoolean('REQUIRE_TAX_INVOICE_BEFORE_FINAL_INVOICE', true);
-    if (requireTax && !taxDocs.length) throw new BadRequestException('Faktur Pajak Coretax belum tersedia');
+    if (!taxDocs.length) throw new BadRequestException('Faktur Pajak Coretax belum tersedia');
 
     const parts: PdfPart[] = [];
     const invoicePdf = await this.pdf.htmlToPdf(await this.invoicePrint.render(invoiceId));

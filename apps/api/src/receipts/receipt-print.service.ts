@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ReceiptStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { ReceiptsService } from './receipts.service';
+import { assertInvoicePrintable } from '../common/print/tax-invoice-print-gate';
 
 @Injectable()
 export class ReceiptPrintService {
@@ -20,6 +21,8 @@ export class ReceiptPrintService {
 
   async render(id: bigint) {
     const row = await this.receipts.get(id);
+    assertInvoicePrintable(row.invoice);
+    if (row.status !== ReceiptStatus.FINAL) throw new BadRequestException('Kwitansi harus FINAL sebelum dapat dicetak');
     const company = await this.prisma.companyProfile.findFirst();
     const seller = (row.sellerSnapshot ?? (company ? { companyName: company.companyName, city: company.city } : {})) as Record<string, unknown>;
     const customer = (row.customerSnapshot ?? row.invoice.billTo) as Record<string, unknown>;

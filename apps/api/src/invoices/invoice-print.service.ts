@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InvoiceStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { InvoicesService } from './invoices.service';
+import { assertInvoicePrintable } from '../common/print/tax-invoice-print-gate';
 
 @Injectable()
 export class InvoicePrintService {
@@ -27,6 +28,7 @@ export class InvoicePrintService {
 
   async render(id: bigint) {
     const row = await this.invoices.get(id);
+    assertInvoicePrintable(row);
     const company = await this.prisma.companyProfile.findFirst({ include: { bankAccounts: { where: { active: true }, orderBy: [{ isDefault: 'desc' }, { id: 'asc' }] } } });
     const liveSeller = company ? {
       companyName: company.companyName, address: company.address, city: company.city, province: company.province,
