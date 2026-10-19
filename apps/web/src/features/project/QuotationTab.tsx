@@ -34,7 +34,7 @@ export function QuotationTab({data,reload}:{data:WorkspaceData;reload:()=>Promis
   e.preventDefault();setBusy(true);setError('');
   try{
    if(editingId&&!data.quotations.some(q=>q.id===editingId&&q.status==='DRAFT'))throw new Error('Quotation sudah terkunci. Buat revisi baru.');
-   const payload={...form,validUntil:form.validUntil||undefined,taxRate:form.taxRate?Number(form.taxRate):undefined,items:items.map(itemPayload)};
+   const payload={...form,validUntil:form.validUntil||undefined,taxRate:form.taxRate.trim()===''?(editingId?0:undefined):Number(form.taxRate),items:items.map(itemPayload)};
    await api(editingId?`/quotations/${editingId}`:`/projects/${data.project.id}/quotations`,{method:editingId?'PATCH':'POST',body:JSON.stringify(payload)});
    setShowForm(false);setEditingId(null);await reload();
   }catch(e){setError(e instanceof Error?e.message:'Gagal menyimpan draft');}finally{setBusy(false);}
