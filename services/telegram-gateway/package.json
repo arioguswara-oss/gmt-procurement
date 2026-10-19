@@ -1,0 +1,15 @@
+{
+  "name": "@gmt/telegram-cloudflare-gateway",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "Standalone best-effort Telegram Cloudflare Worker, OFF by default, read-only GitHub",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "check": "node --check ./src/core.mjs && node --check ./src/worker.mjs && node --check ./test/worker.test.mjs && node --check ./cloudflare-single-file.mjs && node --check ./scripts/build-single-file.mjs",
+    "test": "node --test",
+    "build": "node scripts/build-single-file.mjs"
+  }
+}

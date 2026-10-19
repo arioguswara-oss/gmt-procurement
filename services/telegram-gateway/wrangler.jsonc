@@ -1,0 +1,12 @@
+{
+  "name": "gmt-procurement-telegram",
+  "main": "./src/worker.mjs",
+  "compatibility_date": "2026-10-19",
+  "workers_dev": true,
+  "vars": {
+    "GMT_TELEGRAM_MODE": "off"
+  },
+  "observability": {
+    "enabled": false
+  }
+}
