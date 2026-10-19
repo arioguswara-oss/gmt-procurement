@@ -47,8 +47,10 @@ test('DO displays correct company contact and per-item notes with HTML escaping'
   assert.match(html, /Tel: \+62 10/);
   assert.match(html, /Handle &amp; test &lt;before shipping&gt;/);
   assert.doesNotMatch(html, /<before shipping>/);
-  assert.match(html, /This DO/);
-  assert.match(html, /Not in current DO/); // preserve existing all-PO-items matrix
+  assert.match(html, /Description of Goods Delivered/);
+  assert.match(html, /Circuit breaker/);
+  assert.doesNotMatch(html, /Not in current DO/); // never imply undelivered goods were received
+  assert.doesNotMatch(html, /<th[^>]*>Balance<\/th>/);
 });
 test('draft DO is visibly watermarked and has signature spaces', async () => {
   const html = await render(makeDo({ status: 'DRAFT' }));
@@ -82,4 +84,12 @@ test('DO matrix retains current-line notes without changing partial-delivery qua
   assert.equal(rows[0].thisDelivery.toString(), '2');
   assert.equal(rows[0].previouslyDelivered.toString(), '1');
   assert.equal(rows[0].balanceAfterThisDo.toString(), '2');
+});
+
+test('partial DO print contains only this shipment quantity, not PO or previous totals', async () => {
+  const html = await render(makeDo());
+  assert.match(html, /<td class="r strong">2<\/td>/);
+  assert.doesNotMatch(html, /<td class="r strong">3<\/td>/);
+  assert.doesNotMatch(html, /<th[^>]*>Previous<\/th>/);
+  assert.match(html, /Remaining PO quantities are tracked separately/);
 });
