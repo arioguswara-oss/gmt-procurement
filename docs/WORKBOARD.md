@@ -117,3 +117,11 @@ Progres source tidak disamakan dengan hosting. READY TO DEPLOY hanya jika syntax
 - Jika perlu menghubungkan dokumen ke App, desain ID stabil, ACL, fail-closed dan audit trail terlebih dahulu; folder dapat dibaca bukan bukti integrasi tersedia.
 - **Penyesuaian prioritas:** P2-WORKSPACE = perumusan workflow/dokumen dan permission (BLOCKED_APPROVAL untuk setiap Drive write); P2-SUPPLIER = audit existing + klasifikasi workspace/app dahulu, bukan coding otomatis. P0-IMPORT tetap IN_PROGRESS tanpa benturan lane.
 - Status: Overall Source/Foundation staged lokal, import PENDING; Module Progress belum ada implementasi baru; Source/Test syntax PASS, full build/regression PENDING; Hosting NOT VERIFIED; Deploy NOT READY; LOCK NO.
+
+
+## P0-IMPORT dependency preflight — 2026-10-19
+- File baru `docs/BUILD_DEPENDENCY_SAFETY_20261019.md` mendokumentasikan entry `package.json` source ZIP v0.15.0, tidak menjalankan package scripts.
+- **DILARANG dieksekusi tanpa scoped approval/isolated DB:** `prisma:push:staging` (`prisma db push`), `prisma:seed`, `setup:staging` (termasuk seed), serta `apps/api` `prisma:migrate` (`migrate dev`).
+- Tidak ditemukan root dependency lockfile; jangan menjalankan `npm install` tak terkontrol, mengasumsikan build reproduksibel, atau memakai production DB. Tes build/regression masih PENDING.
+- GitHub source import tetap PENDING manual security/completeness; PR #4 tetap DRAFT, tidak ada deployment.
+- Status: Overall Source/Foundation source-only staged / import PENDING; Module Progress static audit; Source/Test syntax PASS, build PENDING; Hosting NOT VERIFIED; Deploy NOT READY; LOCK NO.
