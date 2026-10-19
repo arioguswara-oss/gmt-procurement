@@ -46,6 +46,8 @@ export class QuotationPrintService {
     const signatory = (q.signatorySnapshot ?? (liveCompany ? { name: liveCompany.defaultSignatoryName, title: liveCompany.defaultSignatoryTitle } : {})) as Record<string, unknown>;
 
     const sellerName = seller.companyName ?? 'PT Gayuh Mandala Teknika';
+    const senderName = q.project.origin?.senderName?.trim() || '-';
+    const customerPic = q.customerContact?.name?.trim();
     const customerName = customer.companyName ?? q.customer.companyName;
     const customerAddress = [
       customer.address ?? q.customer.address,
@@ -88,6 +90,8 @@ export class QuotationPrintService {
   .header { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid #111; padding-bottom:5mm; }
   .company { font-size:16pt; font-weight:700; }
   .company-meta { margin-top:2mm; line-height:1.45; max-width:110mm; }
+  .document-ref { color:#475569; margin-top:1mm; }
+  .stamp-space { min-height:20mm; display:flex; align-items:end; color:#64748b; font-size:9pt; }
   .quote-title { font-size:20pt; font-weight:700; letter-spacing:.5px; text-align:right; }
   .meta { margin-top:5mm; display:grid; grid-template-columns:1fr 1fr; gap:4mm 10mm; }
   .box { border:1px solid #bbb; padding:3mm; min-height:27mm; }
@@ -124,6 +128,7 @@ ${draftMark}
         ${this.esc(seller.address ?? '')}<br/>
         ${this.esc([seller.city, seller.province, seller.postalCode].filter(Boolean).join(', '))}<br/>
         ${seller.phone ? `Tel: ${this.esc(seller.phone)}` : ''}${seller.email ? ` &nbsp; Email: ${this.esc(seller.email)}` : ''}
+        ${q.createdBy?.name ? `<div class="document-ref">Prepared by: ${this.esc(q.createdBy.name)}</div>` : ''}
       </div>
     </div>
     <div>
@@ -134,8 +139,10 @@ ${draftMark}
 
   <div class="meta">
     <div class="box">
-      <div><span class="label">Customer</span> ${this.esc(q.customerContact?.name ?? '')}</div>
+      <div><span class="label">Customer</span></div>
       <div style="font-weight:700;margin-top:1mm">${this.esc(customerName)}</div>
+      <div><span class="label">Sender Name</span> ${this.esc(senderName)}</div>
+      ${customerPic ? `<div><span class="label">Attention / PIC</span> ${this.esc(customerPic)}</div>` : ''}
       <div>${this.esc(customerAddress)}</div>
       ${q.customer.phone ? `<div>Tel: ${this.esc(q.customer.phone)}</div>` : ''}
     </div>
@@ -167,7 +174,7 @@ ${draftMark}
   </div>
 
   <div class="signature">
-    <div>Best Regards,</div><div class="sign-space"></div>
+    <div>Best Regards,</div><div class="stamp-space">Signature / Company Stamp</div>
     <div><strong>${this.esc(signatory.name ?? '')}</strong></div>
     <div>${this.esc(signatory.title ?? '')}</div>
   </div>
