@@ -6,8 +6,9 @@ const assert = require('node:assert/strict');
 require('reflect-metadata');
 const { DeliveryOrderPrintService } = require('../apps/api/dist/delivery-orders/delivery-order-print.service');
 const { DeliveryOrdersService } = require('../apps/api/dist/delivery-orders/delivery-orders.service');
+const { Prisma } = require('@prisma/client');
 
-const d = (value) => ({ toString: () => String(value), greaterThan: (n) => value > n, minus: (n) => d(value - Number(n.toString?.() ?? n)) });
+const d = (value) => new Prisma.Decimal(value);
 function makeDo(overrides = {}) {
   return {
     doNo: 'DO-TEST', doDate: new Date('2026-10-20'), status: 'ISSUED',
