@@ -136,3 +136,10 @@ Progres source tidak disamakan dengan hosting. READY TO DEPLOY hanya jika syntax
 - P0-IMPORT lane remains **IN_PROGRESS**; no change to PR #5 docs-only Workspace lane, Telegram lane, Hermes server, SANRO or production.
 - Next: manual privacy/secret & import completeness review; secure private repo source import on dedicated branch; isolated build after dependency gating.
 - Reporting: Overall Source/Foundation candidate verification DONE_SOURCE, import PENDING; Module Progress no new feature; Source/Test candidate gate 6/6 PASS local, build/regression PENDING; Hosting NOT VERIFIED; Deploy NOT READY; LOCK NO.
+
+## P0-IMPORT static AST spot-check — 2026-10-19
+- Independent local read-only check with globally installed TypeScript parser: `113` TS/TSX files, `0` syntax diagnostics, `334` relative imports/re-exports/dynamic imports assessed, `0` unresolved. Counts differ from older 333 test because traversal criteria include dynamic import/re-export; no claim full module resolution against npm dependencies.
+- New verification script and test blobs identical to tested local copies; **six** synthetic candidate gate unit tests local PASS. Verified candidate ZIP checksum and per-file hashes; status `REVIEW_REQUIRED` rather than deploy approval.
+- PR #4 HEAD before this checkpoint `109fff3a6abcc5f5f0ceec8b355024e5910fe4c0`; combined status returned **zero CI checks**. Do NOT label GitHub CI PASS.
+- No source app import, no npm install/build, no DB usage, no Hermes actions, no Drive write or production deploy.
+- Next gated task: private repo source import via secure tool that can transfer local artifact without credentials; manual secret/privacy review remains required. 
