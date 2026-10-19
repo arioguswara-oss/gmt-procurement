@@ -36,6 +36,7 @@ export function BillingTab({data,reload}:{data:WorkspaceData;reload:()=>Promise<
     {inv.status==='READY_TO_FINALIZE'&&<button className="btn primary small" onClick={()=>action(inv.id,'finalize','Invoice sudah FINAL.')}>Finalize Invoice</button>}
     {inv.status==='FINAL'&&<button className="btn small" disabled={!canPrint} onClick={()=>archive(`/invoices/${inv.id}/archive-pdf`,'PDF Invoice FINAL disimpan ke Documents.')}>Archive Invoice PDF</button>}
    </div></div>
+   {!canPrint&&<p className="muted" role="status">Cetak Invoice dan Kwitansi terkunci: Invoice harus FINAL dan Faktur Pajak Coretax aktif harus diunggah lebih dahulu.</p>}
    <div className="billing-summary"><div><span>Tax</span><strong>{formatMoney(inv.taxAmount,inv.currency)}</strong></div><div><span>Paid</span><strong>{formatMoney(paid,inv.currency)}</strong></div><div><span>Outstanding</span><strong>{formatMoney(outstanding,inv.currency)}</strong></div><div><span>Payment Status</span><strong>{outstanding<=0?'PAID':paid>0?'PARTIALLY PAID':'UNPAID'}</strong></div></div>
    {inv.taxDocuments?.length?<div className="subsection-line"><span>Faktur Pajak</span><strong>{inv.taxDocuments.filter(t=>t.status==='UPLOADED'&&t.documents?.some(d=>d.documentType==='TAX_INVOICE')).length} Faktur Pajak aktif</strong></div>:null}
 
