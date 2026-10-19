@@ -67,3 +67,11 @@ Progres source tidak disamakan dengan hosting. READY TO DEPLOY hanya jika syntax
 - No `npm install`, full Nest/Vite build, Prisma generate/push/migrate/seed, DB access, Hermes SSH, Drive write, automation, SANRO or hosting changes.
 - Next: verify 8 new tests on Hermes **only when Rio agrees to a manual on-demand test**. Full app build remains BLOCKED until source import, auditable lockfile and isolated resource limits; cannot claim CI stage 2 PASS on Hermes yet.
 - Status reporting: Overall Source/Foundation source candidate locally staged, GitHub import PENDING. Module Progress 0% new business features. Source/Test 8/8 local PASS, full build/regression PENDING; Hosting NOT VERIFIED; Deploy NOT READY; LOCK NO.
+
+## HERMES-CI-PREBUILD — Hermes test verification 2026-10-19 11:10 WIB
+- Rio's SSH screenshot: verified fetched SHA `69d7d15b74414a11feda9f236dee0a4e4beca397`, active Hermes branch unchanged. Synthetic test files extracted from that commit into a temporary directory and run as `gmtci` under Bubblewrap with user/pid/net/ipc/uts isolation and 60-second timeout.
+- `Ran 8 tests in 0.032s` → `OK`, `HERMES_PREBUILD_TEST_PASS`, terminal returned. **8/8 PASS on Hermes**, not just locally. Prior workboard line `testing on Hermes PENDING` is superseded.
+- Updated `docs/HERMES_PREBUILD_READINESS_20261019.md` with run evidence; no change to `ci/hermes/run-checks.sh`, no CI daemon/auto deploy.
+- Lane status **DONE_SOURCE** (script/tests and observed CI gate PASS); still **full app build BLOCKED**, source not yet imported, root dependency lockfile missing. Resource limits not validated; after-run process listing not repeated for this exact test.
+- Source/Test: prebuild scanner 8/8 Hermes PASS, full build/regression PENDING. Overall source candidate local, import pending; modules no new implementation; hosting NOT VERIFIED; deploy NOT READY; LOCK NO.
+- NEXT: source import preflight/manual secret review and dependency lockfile strategy, then scoped build only after isolation requirements are met.
