@@ -8,7 +8,8 @@
     "node": ">=22"
   },
   "scripts": {
-    "check": "node --check ./src/core.mjs && node --check ./src/worker.mjs && node --check ./test/worker.test.mjs",
-    "test": "node --test"
+    "check": "node --check ./src/core.mjs && node --check ./src/worker.mjs && node --check ./test/worker.test.mjs && node --check ./cloudflare-single-file.mjs && node --check ./scripts/build-single-file.mjs",
+    "test": "node --test",
+    "build": "node scripts/build-single-file.mjs"
   }
 }

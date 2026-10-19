@@ -52,3 +52,10 @@ P1-TELEGRAM-GATEWAY | Owner ChatGPT | DONE_SOURCE pending review | Ownership `se
 - Hosting Verification: NOT VERIFIED.
 - Deploy Readiness: NOT READY.
 - LOCK: NO.
+
+## Diagnostic revision (2026-10-19)
+
+See [DIAGNOSTIC_CHECKPOINT.md](DIAGNOSTIC_CHECKPOINT.md) for evidence, status gates and permission review.
+Run `npm run build` after editing modular source; commit the generated single-file too.
+`npm test` tests both distributions and rejects drift. The revision is source-only and has not been deployed.
+Earlier NOT DEPLOYED statements describe the original prototype, not verified current hosting state.
