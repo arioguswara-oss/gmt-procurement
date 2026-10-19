@@ -1,0 +1,713 @@
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "client"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  FINANCE
+  OPERATIONS
+  VIEWER
+}
+
+enum ProjectSourceType {
+  RFQ_EMAIL
+  TENDER
+  DIRECT_APPOINTMENT
+  DIRECT_PO
+  REPEAT_ORDER
+  OTHER
+}
+
+enum QuotationStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REJECTED
+  CANCELLED
+  SUPERSEDED
+}
+
+enum PurchaseOrderStatus {
+  RECEIVED
+  ACTIVE
+  CLOSED
+  CANCELLED
+}
+
+enum DeliveryOrderStatus {
+  DRAFT
+  ISSUED
+  AWAITING_RECEIPT
+  RECEIVED
+  CANCELLED
+}
+
+enum ReceivingDocumentType {
+  SIGNED_DO
+  GOODS_RECEIVING
+  SERVICE_RECEIVING
+  OTHER
+}
+
+enum InvoiceStatus {
+  DRAFT
+  WAITING_TAX_INVOICE
+  READY_TO_FINALIZE
+  FINAL
+  CANCELLED
+}
+
+enum TaxDocumentStatus {
+  UPLOADED
+  REPLACED
+  CANCELLED
+}
+
+enum ReceiptStatus {
+  DRAFT
+  FINAL
+  CANCELLED
+}
+
+enum PaymentMethod {
+  BANK_TRANSFER
+  CASH
+  GIRO
+  OTHER
+}
+
+enum DocumentType {
+  ORIGINAL_EMAIL
+  RFQ_ATTACHMENT
+  QUOTATION_PDF
+  ORIGINAL_PO
+  DELIVERY_ORDER_PDF
+  SIGNED_DO
+  RECEIVING_DOCUMENT
+  INVOICE_PDF
+  TAX_INVOICE
+  RECEIPT_PDF
+  BILLING_PACKAGE_PDF
+  PAYMENT_PROOF
+  OTHER
+}
+
+model User {
+  id           BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  name         String   @db.VarChar(150)
+  email        String   @unique @db.VarChar(190)
+  passwordHash String   @map("password_hash") @db.VarChar(255)
+  role         UserRole @default(SUPER_ADMIN)
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.DateTime(3)
+
+  projectsCreated           Project[]           @relation("ProjectCreatedBy")
+  projectsOwned             Project[]           @relation("ProjectOwner")
+  projectOriginsCreated     ProjectOrigin[]     @relation("ProjectOriginCreatedBy")
+  quotationsCreated         Quotation[]         @relation("QuotationCreatedBy")
+  quotationsUpdated         Quotation[]         @relation("QuotationUpdatedBy")
+  purchaseOrdersCreated     PurchaseOrder[]     @relation("PurchaseOrderCreatedBy")
+  purchaseOrdersUpdated     PurchaseOrder[]     @relation("PurchaseOrderUpdatedBy")
+  deliveryOrdersCreated     DeliveryOrder[]     @relation("DeliveryOrderCreatedBy")
+  deliveryOrdersUpdated     DeliveryOrder[]     @relation("DeliveryOrderUpdatedBy")
+  receivingDocumentsCreated ReceivingDocument[] @relation("ReceivingDocumentCreatedBy")
+  invoicesCreated           Invoice[]           @relation("InvoiceCreatedBy")
+  invoicesUpdated           Invoice[]           @relation("InvoiceUpdatedBy")
+  taxDocumentsUploaded      TaxDocument[]       @relation("TaxDocumentUploadedBy")
+  receiptsCreated           Receipt[]           @relation("ReceiptCreatedBy")
+  paymentsCreated           Payment[]           @relation("PaymentCreatedBy")
+  documentsUploaded         Document[]          @relation("DocumentUploadedBy")
+  activityLogs              ActivityLog[]
+
+  @@map("users")
+}
+
+model CompanyProfile {
+  id              BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  companyName     String   @map("company_name") @db.VarChar(190)
+  legalName       String?  @map("legal_name") @db.VarChar(190)
+  npwp            String?  @db.VarChar(50)
+  email           String?  @db.VarChar(190)
+  phone           String?  @db.VarChar(80)
+  address         String?  @db.Text
+  city            String?  @db.VarChar(120)
+  province        String?  @db.VarChar(120)
+  postalCode      String?  @map("postal_code") @db.VarChar(20)
+  country         String?  @default("Indonesia") @db.VarChar(120)
+  logoPath        String?  @map("logo_path") @db.VarChar(500)
+  defaultCurrency      String   @default("IDR") @map("default_currency") @db.Char(3)
+  defaultSignatoryName String?  @map("default_signatory_name") @db.VarChar(190)
+  defaultSignatoryTitle String? @map("default_signatory_title") @db.VarChar(120)
+  createdAt       DateTime @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.DateTime(3)
+
+  bankAccounts BankAccount[]
+
+  @@map("company_profiles")
+}
+
+model BankAccount {
+  id               BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  companyProfileId BigInt   @map("company_profile_id") @db.UnsignedBigInt
+  bankName         String   @map("bank_name") @db.VarChar(150)
+  branchName       String?  @map("branch_name") @db.VarChar(150)
+  accountNumber    String   @map("account_number") @db.VarChar(100)
+  accountName      String   @map("account_name") @db.VarChar(190)
+  swiftCode        String?  @map("swift_code") @db.VarChar(50)
+  currency         String   @default("IDR") @db.Char(3)
+  isDefault        Boolean  @default(false) @map("is_default")
+  active           Boolean  @default(true)
+  createdAt        DateTime @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.DateTime(3)
+
+  companyProfile CompanyProfile @relation(fields: [companyProfileId], references: [id], onDelete: Cascade)
+
+  @@index([companyProfileId])
+  @@map("bank_accounts")
+}
+
+model BusinessPartner {
+  id          BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  partnerCode String?  @unique @map("partner_code") @db.VarChar(50)
+  companyName String   @map("company_name") @db.VarChar(190)
+  npwp        String?  @db.VarChar(50)
+  email       String?  @db.VarChar(190)
+  phone       String?  @db.VarChar(80)
+  address     String?  @db.Text
+  city        String?  @db.VarChar(120)
+  province    String?  @db.VarChar(120)
+  postalCode  String?  @map("postal_code") @db.VarChar(20)
+  country     String?  @default("Indonesia") @db.VarChar(120)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.DateTime(3)
+
+  contacts                  BusinessPartnerContact[]
+  projectsAsCustomer        Project[]       @relation("ProjectCustomer")
+  quotationCustomers        Quotation[]     @relation("QuotationCustomer")
+  purchaseOrdersAsBuyer     PurchaseOrder[] @relation("PurchaseOrderBuyer")
+  purchaseOrdersAsBillTo    PurchaseOrder[] @relation("PurchaseOrderBillTo")
+  purchaseOrdersAsShipTo    PurchaseOrder[] @relation("PurchaseOrderShipTo")
+  purchaseOrdersAsReceiver  PurchaseOrder[] @relation("PurchaseOrderReceivingParty")
+  invoicesAsBillTo          Invoice[]       @relation("InvoiceBillTo")
+
+  @@index([companyName])
+  @@map("business_partners")
+}
+
+model BusinessPartnerContact {
+  id        BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  partnerId BigInt   @map("partner_id") @db.UnsignedBigInt
+  name      String   @db.VarChar(150)
+  department String? @db.VarChar(120)
+  position   String? @db.VarChar(120)
+  email      String? @db.VarChar(190)
+  phone      String? @db.VarChar(80)
+  active     Boolean @default(true)
+  createdAt  DateTime @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.DateTime(3)
+
+  partner           BusinessPartner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  quotationContacts Quotation[]     @relation("QuotationCustomerContact")
+  poBuyerContacts   PurchaseOrder[] @relation("PurchaseOrderBuyerContact")
+
+  @@index([partnerId])
+  @@map("business_partner_contacts")
+}
+
+model Project {
+  id             BigInt            @id @default(autoincrement()) @db.UnsignedBigInt
+  gmtReference   String            @unique @map("gmt_reference") @db.VarChar(80)
+  projectName    String            @map("project_name") @db.VarChar(255)
+  sourceType     ProjectSourceType @map("source_type")
+  customerId     BigInt            @map("customer_id") @db.UnsignedBigInt
+  projectOwnerId BigInt            @map("project_owner_id") @db.UnsignedBigInt
+  createdById    BigInt            @map("created_by_id") @db.UnsignedBigInt
+  notes          String?           @db.Text
+  closedAt       DateTime?         @map("closed_at") @db.DateTime(3)
+  createdAt      DateTime          @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt      DateTime          @updatedAt @map("updated_at") @db.DateTime(3)
+
+  customer       BusinessPartner @relation("ProjectCustomer", fields: [customerId], references: [id], onDelete: Restrict)
+  projectOwner   User            @relation("ProjectOwner", fields: [projectOwnerId], references: [id], onDelete: Restrict)
+  createdBy      User            @relation("ProjectCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  origin         ProjectOrigin?
+  quotations     Quotation[]
+  purchaseOrders PurchaseOrder[]
+  invoices       Invoice[]
+  documents      Document[]
+  activityLogs   ActivityLog[]
+
+  @@index([customerId])
+  @@index([projectOwnerId])
+  @@index([createdAt])
+  @@map("projects")
+}
+
+model ProjectOrigin {
+  id                BigInt            @id @default(autoincrement()) @db.UnsignedBigInt
+  projectId         BigInt            @unique @map("project_id") @db.UnsignedBigInt
+  originType        ProjectSourceType @map("origin_type")
+  externalReference String?           @map("external_reference") @db.VarChar(190)
+  emailSubject      String?           @map("email_subject") @db.VarChar(500)
+  senderName        String?           @map("sender_name") @db.VarChar(190)
+  senderEmail       String?           @map("sender_email") @db.VarChar(190)
+  receivedAt        DateTime?         @map("received_at") @db.DateTime(3)
+  quotationDeadline DateTime?         @map("quotation_deadline") @db.DateTime(3)
+  notes             String?           @db.Text
+  createdById       BigInt            @map("created_by_id") @db.UnsignedBigInt
+  createdAt         DateTime          @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt         DateTime          @updatedAt @map("updated_at") @db.DateTime(3)
+
+  project   Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdBy User       @relation("ProjectOriginCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  documents Document[]
+
+  @@index([externalReference])
+  @@map("project_origins")
+}
+
+model Quotation {
+  id                BigInt          @id @default(autoincrement()) @db.UnsignedBigInt
+  projectId         BigInt          @map("project_id") @db.UnsignedBigInt
+  quotationNo       String          @map("quotation_no") @db.VarChar(120)
+  revisionNo        Int             @default(0) @map("revision_no")
+  supersedesId      BigInt?         @map("supersedes_id") @db.UnsignedBigInt
+  quotationDate     DateTime        @map("quotation_date") @db.Date
+  validUntil        DateTime?       @map("valid_until") @db.Date
+  rfqNo             String?         @map("rfq_no") @db.VarChar(190)
+  status            QuotationStatus @default(DRAFT)
+  customerId        BigInt          @map("customer_id") @db.UnsignedBigInt
+  customerContactId BigInt?         @map("customer_contact_id") @db.UnsignedBigInt
+  subject           String?         @db.VarChar(500)
+  currency          String          @default("IDR") @db.Char(3)
+  subtotal          Decimal         @default(0) @db.Decimal(18, 2)
+  discountRate      Decimal?        @map("discount_rate") @db.Decimal(8, 4)
+  discountAmount    Decimal         @default(0) @map("discount_amount") @db.Decimal(18, 2)
+  taxScheme         String?         @map("tax_scheme") @db.VarChar(50)
+  taxRate           Decimal?        @map("tax_rate") @db.Decimal(8, 4)
+  taxBase           Decimal?        @map("tax_base") @db.Decimal(18, 2)
+  taxAmount         Decimal         @default(0) @map("tax_amount") @db.Decimal(18, 2)
+  grandTotal        Decimal         @default(0) @map("grand_total") @db.Decimal(18, 2)
+  deliveryTerm      String?         @map("delivery_term") @db.Text
+  deliveryTime      String?         @map("delivery_time") @db.VarChar(255)
+  paymentTerm       String?         @map("payment_term") @db.Text
+  certificateTerm   String?         @map("certificate_term") @db.Text
+  additionalNotes   String?         @map("additional_notes") @db.Text
+  sellerSnapshot    Json?           @map("seller_snapshot")
+  customerSnapshot  Json?           @map("customer_snapshot")
+  signatorySnapshot Json?           @map("signatory_snapshot")
+  createdById       BigInt          @map("created_by_id") @db.UnsignedBigInt
+  updatedById       BigInt?         @map("updated_by_id") @db.UnsignedBigInt
+  createdAt         DateTime        @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt         DateTime        @updatedAt @map("updated_at") @db.DateTime(3)
+  finalizedAt       DateTime?       @map("finalized_at") @db.DateTime(3)
+
+  project         Project                 @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  customer        BusinessPartner         @relation("QuotationCustomer", fields: [customerId], references: [id], onDelete: Restrict)
+  customerContact BusinessPartnerContact? @relation("QuotationCustomerContact", fields: [customerContactId], references: [id], onDelete: SetNull)
+  createdBy       User                    @relation("QuotationCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  updatedBy       User?                   @relation("QuotationUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  supersedes      Quotation?              @relation("QuotationRevisionChain", fields: [supersedesId], references: [id], onDelete: SetNull)
+  supersededBy    Quotation[]             @relation("QuotationRevisionChain")
+  items           QuotationItem[]
+  purchaseOrders  PurchaseOrder[]
+  documents       Document[]
+
+  @@unique([quotationNo, revisionNo])
+  @@index([projectId])
+  @@index([rfqNo])
+  @@map("quotations")
+}
+
+model QuotationItem {
+  id           BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  quotationId  BigInt   @map("quotation_id") @db.UnsignedBigInt
+  lineNo       Int      @map("line_no")
+  description  String   @db.Text
+  partNumber   String?  @map("part_number") @db.VarChar(190)
+  manufacturer String?  @db.VarChar(190)
+  model        String?  @db.VarChar(190)
+  origin       String?  @db.VarChar(120)
+  qty          Decimal  @db.Decimal(18, 4)
+  uom          String   @db.VarChar(50)
+  unitPrice    Decimal  @map("unit_price") @db.Decimal(18, 2)
+  lineTotal    Decimal  @map("line_total") @db.Decimal(18, 2)
+  notes        String?  @db.Text
+  createdAt    DateTime @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.DateTime(3)
+
+  quotation Quotation @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+
+  @@unique([quotationId, lineNo])
+  @@index([partNumber])
+  @@map("quotation_items")
+}
+
+model PurchaseOrder {
+  id               BigInt              @id @default(autoincrement()) @db.UnsignedBigInt
+  projectId        BigInt              @map("project_id") @db.UnsignedBigInt
+  quotationId      BigInt?             @map("quotation_id") @db.UnsignedBigInt
+  poNo             String              @map("po_no") @db.VarChar(190)
+  poDate           DateTime            @map("po_date") @db.Date
+  buyerId          BigInt              @map("buyer_id") @db.UnsignedBigInt
+  billToId         BigInt?             @map("bill_to_id") @db.UnsignedBigInt
+  shipToId         BigInt?             @map("ship_to_id") @db.UnsignedBigInt
+  receivingPartyId BigInt?             @map("receiving_party_id") @db.UnsignedBigInt
+  buyerContactId   BigInt?             @map("buyer_contact_id") @db.UnsignedBigInt
+  requestorName    String?             @map("requestor_name") @db.VarChar(190)
+  prNo             String?             @map("pr_no") @db.VarChar(190)
+  currency         String              @default("IDR") @db.Char(3)
+  subtotal         Decimal             @default(0) @db.Decimal(18, 2)
+  taxIncluded      Boolean             @default(false) @map("tax_included")
+  taxAmount        Decimal             @default(0) @map("tax_amount") @db.Decimal(18, 2)
+  grandTotal       Decimal             @default(0) @map("grand_total") @db.Decimal(18, 2)
+  deliveryTerm     String?             @map("delivery_term") @db.Text
+  paymentTerm      String?             @map("payment_term") @db.Text
+  notes            String?             @db.Text
+  status           PurchaseOrderStatus @default(RECEIVED)
+  buyerSnapshot    Json?               @map("buyer_snapshot")
+  billToSnapshot   Json?               @map("bill_to_snapshot")
+  shipToSnapshot   Json?               @map("ship_to_snapshot")
+  createdById      BigInt              @map("created_by_id") @db.UnsignedBigInt
+  updatedById      BigInt?             @map("updated_by_id") @db.UnsignedBigInt
+  createdAt        DateTime            @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt        DateTime            @updatedAt @map("updated_at") @db.DateTime(3)
+
+  project        Project                 @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  quotation      Quotation?              @relation(fields: [quotationId], references: [id], onDelete: SetNull)
+  buyer          BusinessPartner         @relation("PurchaseOrderBuyer", fields: [buyerId], references: [id], onDelete: Restrict)
+  billTo         BusinessPartner?        @relation("PurchaseOrderBillTo", fields: [billToId], references: [id], onDelete: SetNull)
+  shipTo         BusinessPartner?        @relation("PurchaseOrderShipTo", fields: [shipToId], references: [id], onDelete: SetNull)
+  receivingParty BusinessPartner?        @relation("PurchaseOrderReceivingParty", fields: [receivingPartyId], references: [id], onDelete: SetNull)
+  buyerContact   BusinessPartnerContact? @relation("PurchaseOrderBuyerContact", fields: [buyerContactId], references: [id], onDelete: SetNull)
+  createdBy      User                    @relation("PurchaseOrderCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  updatedBy      User?                   @relation("PurchaseOrderUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  items          PurchaseOrderItem[]
+  deliveryOrders DeliveryOrder[]
+  invoices       Invoice[]
+  documents      Document[]
+
+  @@unique([buyerId, poNo])
+  @@index([projectId])
+  @@index([prNo])
+  @@map("purchase_orders")
+}
+
+model PurchaseOrderItem {
+  id              BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  purchaseOrderId BigInt   @map("purchase_order_id") @db.UnsignedBigInt
+  lineNo          Int      @map("line_no")
+  description     String   @db.Text
+  partNumber      String?  @map("part_number") @db.VarChar(190)
+  manufacturer    String?  @db.VarChar(190)
+  model           String?  @db.VarChar(190)
+  qtyOrdered      Decimal  @map("qty_ordered") @db.Decimal(18, 4)
+  uom             String   @db.VarChar(50)
+  unitPrice       Decimal  @map("unit_price") @db.Decimal(18, 2)
+  lineTotal       Decimal  @map("line_total") @db.Decimal(18, 2)
+  notes           String?  @db.Text
+  createdAt       DateTime @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.DateTime(3)
+
+  purchaseOrder PurchaseOrder       @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  deliveryItems DeliveryOrderItem[]
+  invoiceItems  InvoiceItem[]
+
+  @@unique([purchaseOrderId, lineNo])
+  @@index([partNumber])
+  @@map("purchase_order_items")
+}
+
+model DeliveryOrder {
+  id               BigInt              @id @default(autoincrement()) @db.UnsignedBigInt
+  purchaseOrderId  BigInt              @map("purchase_order_id") @db.UnsignedBigInt
+  doNo             String              @unique @map("do_no") @db.VarChar(120)
+  doDate           DateTime            @map("do_date") @db.Date
+  status           DeliveryOrderStatus @default(DRAFT)
+  deliveryAddress  String?             @map("delivery_address") @db.Text
+  deliveryContact  String?             @map("delivery_contact") @db.VarChar(190)
+  vehicleNo        String?             @map("vehicle_no") @db.VarChar(80)
+  driverName       String?             @map("driver_name") @db.VarChar(190)
+  notes            String?             @db.Text
+  sellerSnapshot   Json?               @map("seller_snapshot")
+  receiverSnapshot Json?               @map("receiver_snapshot")
+  createdById      BigInt              @map("created_by_id") @db.UnsignedBigInt
+  updatedById      BigInt?             @map("updated_by_id") @db.UnsignedBigInt
+  createdAt        DateTime            @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt        DateTime            @updatedAt @map("updated_at") @db.DateTime(3)
+  receivedAt       DateTime?           @map("received_at") @db.DateTime(3)
+
+  purchaseOrder     PurchaseOrder          @relation(fields: [purchaseOrderId], references: [id], onDelete: Restrict)
+  createdBy         User                   @relation("DeliveryOrderCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  updatedBy         User?                  @relation("DeliveryOrderUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  items             DeliveryOrderItem[]
+  receivingDocuments ReceivingDocument[]
+  invoiceLinks      InvoiceDeliveryOrder[]
+  documents         Document[]
+
+  @@index([purchaseOrderId])
+  @@index([doDate])
+  @@map("delivery_orders")
+}
+
+model DeliveryOrderItem {
+  id                  BigInt  @id @default(autoincrement()) @db.UnsignedBigInt
+  deliveryOrderId     BigInt  @map("delivery_order_id") @db.UnsignedBigInt
+  purchaseOrderItemId BigInt  @map("purchase_order_item_id") @db.UnsignedBigInt
+  qtyDelivered        Decimal @map("qty_delivered") @db.Decimal(18, 4)
+  notes               String? @db.Text
+
+  deliveryOrder     DeliveryOrder     @relation(fields: [deliveryOrderId], references: [id], onDelete: Cascade)
+  purchaseOrderItem PurchaseOrderItem @relation(fields: [purchaseOrderItemId], references: [id], onDelete: Restrict)
+
+  @@unique([deliveryOrderId, purchaseOrderItemId])
+  @@index([purchaseOrderItemId])
+  @@map("delivery_order_items")
+}
+
+model ReceivingDocument {
+  id              BigInt                @id @default(autoincrement()) @db.UnsignedBigInt
+  deliveryOrderId BigInt                @map("delivery_order_id") @db.UnsignedBigInt
+  documentType    ReceivingDocumentType @map("document_type")
+  documentNo      String?               @map("document_no") @db.VarChar(190)
+  documentDate    DateTime?             @map("document_date") @db.Date
+  receivedBy      String?               @map("received_by") @db.VarChar(190)
+  receivedAt      DateTime?             @map("received_at") @db.DateTime(3)
+  notes           String?               @db.Text
+  createdById     BigInt                @map("created_by_id") @db.UnsignedBigInt
+  createdAt       DateTime              @default(now()) @map("created_at") @db.DateTime(3)
+
+  deliveryOrder DeliveryOrder @relation(fields: [deliveryOrderId], references: [id], onDelete: Cascade)
+  createdBy     User          @relation("ReceivingDocumentCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  documents     Document[]
+
+  @@index([deliveryOrderId])
+  @@map("receiving_documents")
+}
+
+model Invoice {
+  id                BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
+  projectId         BigInt        @map("project_id") @db.UnsignedBigInt
+  purchaseOrderId   BigInt        @map("purchase_order_id") @db.UnsignedBigInt
+  invoiceNo         String        @unique @map("invoice_no") @db.VarChar(120)
+  invoiceDate       DateTime      @map("invoice_date") @db.Date
+  status            InvoiceStatus @default(DRAFT)
+  billToId          BigInt        @map("bill_to_id") @db.UnsignedBigInt
+  currency          String        @default("IDR") @db.Char(3)
+  subtotal          Decimal       @default(0) @db.Decimal(18, 2)
+  taxScheme         String?       @map("tax_scheme") @db.VarChar(50)
+  taxRate           Decimal?      @map("tax_rate") @db.Decimal(8, 4)
+  taxBase           Decimal?      @map("tax_base") @db.Decimal(18, 2)
+  taxAmount         Decimal       @default(0) @map("tax_amount") @db.Decimal(18, 2)
+  grandTotal        Decimal       @default(0) @map("grand_total") @db.Decimal(18, 2)
+  paymentTerm       String?       @map("payment_term") @db.Text
+  dueDate           DateTime?     @map("due_date") @db.Date
+  sellerSnapshot    Json?         @map("seller_snapshot")
+  billToSnapshot    Json?         @map("bill_to_snapshot")
+  bankSnapshot      Json?         @map("bank_snapshot")
+  signatorySnapshot Json?         @map("signatory_snapshot")
+  createdById       BigInt        @map("created_by_id") @db.UnsignedBigInt
+  updatedById       BigInt?       @map("updated_by_id") @db.UnsignedBigInt
+  createdAt         DateTime      @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt         DateTime      @updatedAt @map("updated_at") @db.DateTime(3)
+  finalizedAt       DateTime?     @map("finalized_at") @db.DateTime(3)
+
+  project        Project         @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  purchaseOrder  PurchaseOrder   @relation(fields: [purchaseOrderId], references: [id], onDelete: Restrict)
+  billTo         BusinessPartner @relation("InvoiceBillTo", fields: [billToId], references: [id], onDelete: Restrict)
+  createdBy      User            @relation("InvoiceCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  updatedBy      User?           @relation("InvoiceUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  items          InvoiceItem[]
+  deliveryLinks  InvoiceDeliveryOrder[]
+  taxDocuments   TaxDocument[]
+  receipt        Receipt?
+  payments       Payment[]
+  documents      Document[]
+
+  @@index([projectId])
+  @@index([purchaseOrderId])
+  @@index([invoiceDate])
+  @@map("invoices")
+}
+
+model InvoiceItem {
+  id                  BigInt  @id @default(autoincrement()) @db.UnsignedBigInt
+  invoiceId           BigInt  @map("invoice_id") @db.UnsignedBigInt
+  purchaseOrderItemId BigInt  @map("purchase_order_item_id") @db.UnsignedBigInt
+  description         String  @db.Text
+  qty                 Decimal @db.Decimal(18, 4)
+  uom                 String  @db.VarChar(50)
+  unitPrice           Decimal @map("unit_price") @db.Decimal(18, 2)
+  lineTotal           Decimal @map("line_total") @db.Decimal(18, 2)
+
+  invoice           Invoice           @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  purchaseOrderItem PurchaseOrderItem @relation(fields: [purchaseOrderItemId], references: [id], onDelete: Restrict)
+
+  @@unique([invoiceId, purchaseOrderItemId])
+  @@map("invoice_items")
+}
+
+model InvoiceDeliveryOrder {
+  invoiceId       BigInt @map("invoice_id") @db.UnsignedBigInt
+  deliveryOrderId BigInt @map("delivery_order_id") @db.UnsignedBigInt
+
+  invoice       Invoice       @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  deliveryOrder DeliveryOrder @relation(fields: [deliveryOrderId], references: [id], onDelete: Restrict)
+
+  @@id([invoiceId, deliveryOrderId])
+  @@map("invoice_delivery_orders")
+}
+
+model TaxDocument {
+  id           BigInt            @id @default(autoincrement()) @db.UnsignedBigInt
+  invoiceId    BigInt            @map("invoice_id") @db.UnsignedBigInt
+  documentNo   String?           @map("document_no") @db.VarChar(190)
+  documentDate DateTime?         @map("document_date") @db.Date
+  status       TaxDocumentStatus @default(UPLOADED)
+  uploadedById BigInt            @map("uploaded_by_id") @db.UnsignedBigInt
+  uploadedAt   DateTime          @default(now()) @map("uploaded_at") @db.DateTime(3)
+  notes        String?           @db.Text
+
+  invoice    Invoice    @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  uploadedBy User       @relation("TaxDocumentUploadedBy", fields: [uploadedById], references: [id], onDelete: Restrict)
+  documents  Document[]
+
+  @@index([invoiceId])
+  @@map("tax_documents")
+}
+
+model Receipt {
+  id               BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
+  invoiceId        BigInt        @unique @map("invoice_id") @db.UnsignedBigInt
+  receiptNo        String        @unique @map("receipt_no") @db.VarChar(120)
+  receiptDate      DateTime      @map("receipt_date") @db.Date
+  receivedFrom     String        @map("received_from") @db.VarChar(255)
+  amount           Decimal       @db.Decimal(18, 2)
+  amountInWords    String?       @map("amount_in_words") @db.Text
+  description      String?       @db.Text
+  status           ReceiptStatus @default(DRAFT)
+  sellerSnapshot   Json?         @map("seller_snapshot")
+  customerSnapshot Json?         @map("customer_snapshot")
+  signatorySnapshot Json?        @map("signatory_snapshot")
+  createdById      BigInt        @map("created_by_id") @db.UnsignedBigInt
+  createdAt        DateTime      @default(now()) @map("created_at") @db.DateTime(3)
+  finalizedAt      DateTime?     @map("finalized_at") @db.DateTime(3)
+
+  invoice   Invoice    @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
+  createdBy User       @relation("ReceiptCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  documents Document[]
+
+  @@map("receipts")
+}
+
+model Payment {
+  id            BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
+  invoiceId     BigInt        @map("invoice_id") @db.UnsignedBigInt
+  paymentDate   DateTime      @map("payment_date") @db.Date
+  amount        Decimal       @db.Decimal(18, 2)
+  paymentMethod PaymentMethod @map("payment_method")
+  referenceNo   String?       @map("reference_no") @db.VarChar(190)
+  notes         String?       @db.Text
+  createdById   BigInt        @map("created_by_id") @db.UnsignedBigInt
+  createdAt     DateTime      @default(now()) @map("created_at") @db.DateTime(3)
+
+  invoice   Invoice    @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
+  createdBy User       @relation("PaymentCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  documents Document[]
+
+  @@index([invoiceId])
+  @@map("payments")
+}
+
+model Document {
+  id                  BigInt       @id @default(autoincrement()) @db.UnsignedBigInt
+  projectId           BigInt       @map("project_id") @db.UnsignedBigInt
+  projectOriginId     BigInt?      @map("project_origin_id") @db.UnsignedBigInt
+  quotationId         BigInt?      @map("quotation_id") @db.UnsignedBigInt
+  purchaseOrderId     BigInt?      @map("purchase_order_id") @db.UnsignedBigInt
+  deliveryOrderId     BigInt?      @map("delivery_order_id") @db.UnsignedBigInt
+  receivingDocumentId BigInt?      @map("receiving_document_id") @db.UnsignedBigInt
+  invoiceId           BigInt?      @map("invoice_id") @db.UnsignedBigInt
+  taxDocumentId       BigInt?      @map("tax_document_id") @db.UnsignedBigInt
+  receiptId           BigInt?      @map("receipt_id") @db.UnsignedBigInt
+  paymentId           BigInt?      @map("payment_id") @db.UnsignedBigInt
+  documentType        DocumentType @map("document_type")
+  originalFilename    String       @map("original_filename") @db.VarChar(500)
+  storedFilename      String       @map("stored_filename") @db.VarChar(500)
+  storagePath         String       @unique @map("storage_path") @db.VarChar(1000)
+  mimeType            String       @map("mime_type") @db.VarChar(190)
+  fileSize            BigInt       @map("file_size") @db.UnsignedBigInt
+  sha256              String?      @db.Char(64)
+  notes               String?      @db.Text
+  uploadedById        BigInt       @map("uploaded_by_id") @db.UnsignedBigInt
+  uploadedAt          DateTime     @default(now()) @map("uploaded_at") @db.DateTime(3)
+
+  project           Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectOrigin     ProjectOrigin?     @relation(fields: [projectOriginId], references: [id], onDelete: SetNull)
+  quotation         Quotation?         @relation(fields: [quotationId], references: [id], onDelete: SetNull)
+  purchaseOrder     PurchaseOrder?     @relation(fields: [purchaseOrderId], references: [id], onDelete: SetNull)
+  deliveryOrder     DeliveryOrder?     @relation(fields: [deliveryOrderId], references: [id], onDelete: SetNull)
+  receivingDocument ReceivingDocument? @relation(fields: [receivingDocumentId], references: [id], onDelete: SetNull)
+  invoice           Invoice?           @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  taxDocument       TaxDocument?       @relation(fields: [taxDocumentId], references: [id], onDelete: SetNull)
+  receipt           Receipt?           @relation(fields: [receiptId], references: [id], onDelete: SetNull)
+  payment           Payment?           @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+  uploadedBy        User               @relation("DocumentUploadedBy", fields: [uploadedById], references: [id], onDelete: Restrict)
+
+  @@index([projectId, documentType])
+  @@index([quotationId])
+  @@index([purchaseOrderId])
+  @@index([deliveryOrderId])
+  @@index([invoiceId])
+  @@map("documents")
+}
+
+model ActivityLog {
+  id            BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  projectId     BigInt   @map("project_id") @db.UnsignedBigInt
+  userId        BigInt   @map("user_id") @db.UnsignedBigInt
+  action        String   @db.VarChar(100)
+  entityType    String   @map("entity_type") @db.VarChar(100)
+  entityId      BigInt?  @map("entity_id") @db.UnsignedBigInt
+  description   String?  @db.Text
+  oldValuesJson Json?    @map("old_values_json")
+  newValuesJson Json?    @map("new_values_json")
+  ipAddress     String?  @map("ip_address") @db.VarChar(64)
+  createdAt     DateTime @default(now()) @map("created_at") @db.DateTime(3)
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@index([projectId, createdAt])
+  @@index([userId, createdAt])
+  @@map("activity_logs")
+}
+
+model DocumentSequence {
+  id           BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  documentType String   @map("document_type") @db.VarChar(80)
+  periodKey    String   @map("period_key") @db.VarChar(20)
+  prefix       String?  @db.VarChar(100)
+  lastNumber   Int      @default(0) @map("last_number")
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.DateTime(3)
+
+  @@unique([documentType, periodKey])
+  @@map("document_sequences")
+}
+
+model AppSetting {
+  key       String   @id @db.VarChar(190)
+  value     Json
+  updatedAt DateTime @updatedAt @map("updated_at") @db.DateTime(3)
+
+  @@map("app_settings")
+}

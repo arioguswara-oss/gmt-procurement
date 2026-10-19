@@ -1,0 +1,763 @@
+{
+  "original_sha256": "25ce1448015b34144dc16a67609a61f9ad5dd7ef70fd647b401c3d22caf06813",
+  "import_commit": "f0ad54ef5484f64d9be1609515c7cac841650a90",
+  "provenance": "Reconstructed directly from SHA256-verified original ZIP; prior review bundle unavailable in this session.",
+  "files": [
+    {
+      "path": "app.js",
+      "size": 411,
+      "sha256": "aebd8c9f3a173367ed185c278845decc6135a7feb94fb43234fc7767da074329",
+      "git_blob_sha": "b64efcfa56f1823b7f0317d49db29d92b412570d"
+    },
+    {
+      "path": "apps/web/src/App.tsx",
+      "size": 1445,
+      "sha256": "687e7c38dd7be15188c096e942c0a41724f0be095ac71daa942cbf9a10cdd713",
+      "git_blob_sha": "b29e33d9f49d8c97d24eae6421fece4d9b5ab4be"
+    },
+    {
+      "path": "apps/web/src/features/project/DeliveryTab.tsx",
+      "size": 5508,
+      "sha256": "191b6e2d19dd83588b612af845aabdc65aaf59e132a13ceaaa0f1303bffde0b8",
+      "git_blob_sha": "34e92620357aa0a82bae581d67eea65f1786e766"
+    },
+    {
+      "path": "apps/web/src/features/project/useProjectWorkspace.ts",
+      "size": 1601,
+      "sha256": "f7d33156aa03343cca7929ec40f692d966935d7be9a66af23aa07f829382cc3b",
+      "git_blob_sha": "da55b072d4529cf8d950075f8ffc0882c0fb8370"
+    },
+    {
+      "path": "apps/web/src/features/project/OverviewTab.tsx",
+      "size": 2101,
+      "sha256": "a7d5c74e7a33a414e1c1576cbc26a17b0606b13b53a076c8dd964ed936de4c44",
+      "git_blob_sha": "9e5b43949f3d4684c58057a61ba37d8cc761518e"
+    },
+    {
+      "path": "apps/web/src/features/project/DocumentsTab.tsx",
+      "size": 2067,
+      "sha256": "a56e87a14d3cbebcc023211deb065527e54f9ef4c444db9ed352cd23e3cb8053",
+      "git_blob_sha": "f886db346d802e504ccc59b75e24f20f11c82328"
+    },
+    {
+      "path": "apps/web/src/features/project/PurchaseOrdersTab.tsx",
+      "size": 8151,
+      "sha256": "fb4888a6139d79a91996c85e34444977b600b30ad0740f23a5e9b5eb9607ccca",
+      "git_blob_sha": "0ccfd24b47e477565411c4d119955dcc39efccc4"
+    },
+    {
+      "path": "apps/web/src/features/project/QuotationTab.tsx",
+      "size": 6836,
+      "sha256": "e2a18d53cef9462d6dad0b3a44837bf8fee991defdcf94f4131a79a68a2d5d5a",
+      "git_blob_sha": "138de1e7d7e5a85669b3831183e0aac85fc15b7e"
+    },
+    {
+      "path": "apps/web/src/features/project/BillingTab.tsx",
+      "size": 11909,
+      "sha256": "e5bf5c429af11072fe823a36d57f1c20c3a7d532330c6c6601f1003d7d60b3da",
+      "git_blob_sha": "e01ffb7d6466bdf332f6d84400277c6ec72c9923"
+    },
+    {
+      "path": "apps/web/src/features/project/ActivityTab.tsx",
+      "size": 607,
+      "sha256": "04a766e1da6ab613e822c9e94affc750876f93abbc106c9e3fbf42b16b433e2b",
+      "git_blob_sha": "188a19d51e7d06b2e8c2d5d3c1ae744a7a225267"
+    },
+    {
+      "path": "apps/web/src/lib/format.ts",
+      "size": 1474,
+      "sha256": "7f1e26080407f43941e43d77e30db8a7c27d626d27edeb46a61d460ce5262055",
+      "git_blob_sha": "fe590c3eaf07e3c9f84c7dc0e6fd567f6b049e24"
+    },
+    {
+      "path": "apps/web/src/lib/api.ts",
+      "size": 3803,
+      "sha256": "6a3e258d656b802b15938ed7ac1db155d9c660b3f362fd39b2f25c85755ea761",
+      "git_blob_sha": "8b0ff688646ef49cbb8f5c3778d6e48295d49396"
+    },
+    {
+      "path": "apps/web/src/types.ts",
+      "size": 5174,
+      "sha256": "9aab85c1984f4b602e6a7f37b0fddd16c20151afc3d3ce0e947432109d7a71b9",
+      "git_blob_sha": "8ed6416c377e9d5d695b0ea30f2a13bcb34f6720"
+    },
+    {
+      "path": "apps/web/src/components/AppShell.tsx",
+      "size": 1000,
+      "sha256": "53e798da23e507177b9de069aac8ad5066909752094705656110ef8a035c1576",
+      "git_blob_sha": "7a0f801c6d0feb719af054b5e4487d49f778aa0a"
+    },
+    {
+      "path": "apps/web/src/components/StatusBadge.tsx",
+      "size": 243,
+      "sha256": "4ae30da368ee0ea8d1ba44cd76ef7ad25b4a9e114f1860bb581a63c0c1dff6e2",
+      "git_blob_sha": "e5e82817f015ed9747767b5ec067abe1532b4b7e"
+    },
+    {
+      "path": "apps/web/src/components/Ui.tsx",
+      "size": 1130,
+      "sha256": "eb26ffd23c161f88bfe7477522d7f703557485188eb6475c94f26345a81e07fb",
+      "git_blob_sha": "82893d672f9a1f2f2b6c9f08c7b5bcba8a138cb8"
+    },
+    {
+      "path": "apps/web/src/main.tsx",
+      "size": 427,
+      "sha256": "434938decc89f30869b39c3f7a2a6bf2bb3025f156996cd99603eab5a69d5f81",
+      "git_blob_sha": "345d953d0513ffb37957712b3e6b968f065064c7"
+    },
+    {
+      "path": "apps/web/src/styles.css",
+      "size": 13236,
+      "sha256": "c6a64a6bf05127cba024a9ef941297968c29371a76b6f77dcf91fb399d346afd",
+      "git_blob_sha": "336ed977bce9f71897c01c133638e34effbf5998"
+    },
+    {
+      "path": "apps/web/src/auth/AuthContext.tsx",
+      "size": 1601,
+      "sha256": "0635ca2d78f0995ce6a0252760c7990679de1584cd3acbf630a7f94efbfaed0b",
+      "git_blob_sha": "f0b94311fd6a62898f076e2945d985ccfe63ad7d"
+    },
+    {
+      "path": "apps/web/src/vite-env.d.ts",
+      "size": 38,
+      "sha256": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5",
+      "git_blob_sha": "11f02fe2a0061d6e6e1f271b21da95423b448b32"
+    },
+    {
+      "path": "apps/web/src/pages/DashboardPage.tsx",
+      "size": 2590,
+      "sha256": "1e9ea7409bcfd99050f345b4101cc0b4ca5c9760d77a2e6910bc5abc0dd79d2f",
+      "git_blob_sha": "c0b08b18541c70a4d1fd29a629d33f18600c8e2d"
+    },
+    {
+      "path": "apps/web/src/pages/PartnersPage.tsx",
+      "size": 2744,
+      "sha256": "2a306c9542d95d935f78ee7e9bf27fbfaa6e6a5704e40e9e11e6f6f1d5a5a926",
+      "git_blob_sha": "4066e8a94e7fde4af1118e6e7d29bee419eb3289"
+    },
+    {
+      "path": "apps/web/src/pages/NewProjectPage.tsx",
+      "size": 4258,
+      "sha256": "f31d9c4496893375dd35b7998623f049d6e3ae7b84eca4ddf72635c02a832054",
+      "git_blob_sha": "2d1d7cf92c4346555c3d5701f5ecfa65f3e86bec"
+    },
+    {
+      "path": "apps/web/src/pages/ProjectsPage.tsx",
+      "size": 2008,
+      "sha256": "4821e1adf0703df9fc4c925d3054bf0c3f877ef69bff14746e72542473e72eee",
+      "git_blob_sha": "2ac5e0138dbb28d03ecb97a3cf286fa94c60598a"
+    },
+    {
+      "path": "apps/web/src/pages/ProjectPage.tsx",
+      "size": 2309,
+      "sha256": "4c838528444d7f9b4e8b3d8917ed2cf74967ff434f0bef65a3ef9506bd8cf390",
+      "git_blob_sha": "27fef6bcd216cb95ba6408b4eb0e251a61242b6b"
+    },
+    {
+      "path": "apps/web/src/pages/LoginPage.tsx",
+      "size": 1720,
+      "sha256": "0a2c66bd872dbf8750f5b9fb067d8c9bb9c4735148083fdd8a4d94af262d3391",
+      "git_blob_sha": "4765a9fa937bb996c2c6196c4b934578c84b24df"
+    },
+    {
+      "path": "apps/web/index.html",
+      "size": 352,
+      "sha256": "86427c7eec2a25fcab6d9c7671f392d026bee89cafd11f3acdc50990b7caf6d6",
+      "git_blob_sha": "05554e3e46d5e100d224835aeb1caf4642e26a97"
+    },
+    {
+      "path": "apps/web/vite.config.ts",
+      "size": 189,
+      "sha256": "5b004f322db95895ec0718ca3d6accdae77d37e324a7a5c2c55e28e295933a54",
+      "git_blob_sha": "42ac4dcf58bd1b37ad5f79f4bb45fd90409c1b8e"
+    },
+    {
+      "path": "apps/web/package.json",
+      "size": 513,
+      "sha256": "217921663ce220aa388c09ae2fa8852f6aacebb47a9f1a8b515c69a1f7e982b3",
+      "git_blob_sha": "47cce102f52fdf8e5683f27fff5e0ad81ff02140"
+    },
+    {
+      "path": "apps/web/tsconfig.json",
+      "size": 527,
+      "sha256": "83efc1798334967d5a907f26b8cba31fa213f16b5ac0ed5c02fd38e7cf0ceb66",
+      "git_blob_sha": "dfc3fbee87d79258402f4bfd95113dbc7d25d1aa"
+    },
+    {
+      "path": "apps/api/nest-cli.json",
+      "size": 118,
+      "sha256": "a4e62198ee93c72755ae6663472640e19c7a092eacf6f14c27ab6ad4e33cf2f0",
+      "git_blob_sha": "256648114a9983377debfde44bda4368fb045a39"
+    },
+    {
+      "path": "apps/api/prisma/schema.prisma",
+      "size": 34389,
+      "sha256": "4d8eb8fb4089648224dc59a2f3ffb7e93169645ea16f74562e04053d46ddb76d",
+      "git_blob_sha": "62384e37b403c690ab64be408f9dd60ce7ca45c9"
+    },
+    {
+      "path": "apps/api/src/health.controller.ts",
+      "size": 2491,
+      "sha256": "a613d88658467a64a252409ad98c4f40e9c633aba15034502f8c081390a5e6c8",
+      "git_blob_sha": "16e51c7fd81e569162a6cd20471f314873fe94da"
+    },
+    {
+      "path": "apps/api/src/documents/documents.controller.ts",
+      "size": 1760,
+      "sha256": "7f0ee2a490228e728307f98d6d30ff5460005770b618234361656d5be8fb31e9",
+      "git_blob_sha": "d07fb8d4719987f3bb5107187f072d67c89fcbd7"
+    },
+    {
+      "path": "apps/api/src/documents/upload-document.dto.ts",
+      "size": 712,
+      "sha256": "ff1d271577f44ee09323d764c0474bb2eb0f54f56e5e40565d15533f6ab4f045",
+      "git_blob_sha": "553944cab4379cbe9b184d3474d74ee6f48c2fab"
+    },
+    {
+      "path": "apps/api/src/documents/documents.service.ts",
+      "size": 9607,
+      "sha256": "2457852b48cc94fe225b47e9e9a4b556ee5ed491f9a78bd71ed0e80a9d14ac12",
+      "git_blob_sha": "ccee687db1d7d3c687a9d54511e154d1e0d29766"
+    },
+    {
+      "path": "apps/api/src/documents/documents.module.ts",
+      "size": 534,
+      "sha256": "3903e68bf39acb21b11c968852e1ce29c1784793d920727b2ebf90d24b58cf18",
+      "git_blob_sha": "086d555af651d7782ee8778c5d9da78f93865cd4"
+    },
+    {
+      "path": "apps/api/src/business-partners/dto/create-business-partner.dto.ts",
+      "size": 1017,
+      "sha256": "0844e004b6e67a359053b39f8c99ad35e44ef894d6e6195b93c588de1fa625b5",
+      "git_blob_sha": "17d6f4edc12a94a796a32081f6f7d27db3466ce5"
+    },
+    {
+      "path": "apps/api/src/business-partners/dto/update-business-partner.dto.ts",
+      "size": 214,
+      "sha256": "d3a7f05e50c7d52b73b22caf747bdbb631fa550153e234520a6069082f989a8e",
+      "git_blob_sha": "b413185acddfa9355dcb0d74d0ee146b70be4341"
+    },
+    {
+      "path": "apps/api/src/business-partners/business-partners.service.ts",
+      "size": 1873,
+      "sha256": "1adeaceb07ecdf18c8d737bea321c147b715543697b3a4714b6befe4fa8c9015",
+      "git_blob_sha": "4aba0f240d9045c559232836df7c0a2475dac231"
+    },
+    {
+      "path": "apps/api/src/business-partners/business-partners.module.ts",
+      "size": 440,
+      "sha256": "72b6202b758209bd21b286917441de67f49f44896d026686b961f52ff29ef09c",
+      "git_blob_sha": "3be1e809b45c1981f51fdfe07ec682361d0c9a63"
+    },
+    {
+      "path": "apps/api/src/business-partners/business-partners.controller.ts",
+      "size": 1190,
+      "sha256": "72df5908abe0bbd75c6c56b2758d61860902dac24626d8334603585cf163cc87",
+      "git_blob_sha": "35cc549a13d68ced5f2734f72a7cb72624c78930"
+    },
+    {
+      "path": "apps/api/src/document-sequences/document-sequences.service.ts",
+      "size": 1010,
+      "sha256": "147411dc8bcbbf05ada3ebd27ee75a922a49cc07e6fbd2772008a79b0d43baca",
+      "git_blob_sha": "d76439f0a8931f0cca07f1a5ef128ac4e0edd6af"
+    },
+    {
+      "path": "apps/api/src/document-sequences/document-sequences.module.ts",
+      "size": 248,
+      "sha256": "0fc546804399a243adbe01fac43e5a0b90a44d80b049f20ec8c0aec6c5d79a14",
+      "git_blob_sha": "186b66b7c9004b85ff1a114084a3d45e9a05a296"
+    },
+    {
+      "path": "apps/api/src/projects/projects.service.ts",
+      "size": 6782,
+      "sha256": "082a0375170dd2e2ab088f213cf1fabe92e848a2e75e0aa074a4ce8fe90a1ce7",
+      "git_blob_sha": "fd58123220558a1bd7977a0baf3eecd496f7b87c"
+    },
+    {
+      "path": "apps/api/src/projects/dto/create-project.dto.ts",
+      "size": 1288,
+      "sha256": "261f291b2cc91b181c938c324506065433792eade160ff968ab8a37814437c0d",
+      "git_blob_sha": "e52fe003008b89527153510c054e8b099c2a07f4"
+    },
+    {
+      "path": "apps/api/src/projects/dto/update-project.dto.ts",
+      "size": 287,
+      "sha256": "07038bddf19a618607b1e04f4a7d517fa5e4a495a4f4e32cbb3326db467b9221",
+      "git_blob_sha": "1c30f646f8d26d0d84c8fbc01fae1069b87d19c5"
+    },
+    {
+      "path": "apps/api/src/projects/projects.controller.ts",
+      "size": 1091,
+      "sha256": "282adbdc2d004cf70d277f2007aba2ceba56d6109621c31d8463b344b31199b2",
+      "git_blob_sha": "cfaa2c4e26af3ff65f564295e134b10c91fe9bad"
+    },
+    {
+      "path": "apps/api/src/projects/projects.module.ts",
+      "size": 586,
+      "sha256": "7e0db72191ba7e259a177b1c8b898293072216b5a405bcb6f82d17132e1b46d0",
+      "git_blob_sha": "c8d1f04dbe1a908f0a02ab19a637d4e3f96ea42b"
+    },
+    {
+      "path": "apps/api/src/users/users.service.ts",
+      "size": 505,
+      "sha256": "39abe6417abfc1ff1478aec25275c04a35fda34ce659f08bcc2cbbcdc63c7d5c",
+      "git_blob_sha": "fddc373b76712b7cec04cda4c08b0d8a38e493cb"
+    },
+    {
+      "path": "apps/api/src/users/users.module.ts",
+      "size": 187,
+      "sha256": "da805b45dfe4b5683e6cb928f5986b49c867cfd86ab0873ca83a636c427b2d02",
+      "git_blob_sha": "8fa904f17db508e354ef7f2568649551ec19b830"
+    },
+    {
+      "path": "apps/api/src/delivery-orders/delivery-orders.module.ts",
+      "size": 891,
+      "sha256": "6c2b160f9738651c061cc94f69313068846ed713a99a0dccb27dd3bcd976d149",
+      "git_blob_sha": "24be084b0e9229d07e0a9aff9b151f6a64ec5874"
+    },
+    {
+      "path": "apps/api/src/delivery-orders/dto/update-delivery-order.dto.ts",
+      "size": 206,
+      "sha256": "fd6e5fad68a58da00dfbd472ee4de432c0d00624626fec178820cd5cf5a4d65f",
+      "git_blob_sha": "a188daa924bd124a399d671c5246a77a8d8843cf"
+    },
+    {
+      "path": "apps/api/src/delivery-orders/dto/create-delivery-order.dto.ts",
+      "size": 853,
+      "sha256": "be84adcb481be02c59341305cf5b6c26c0a6f2adbe427a7b7048462c14b7cfe0",
+      "git_blob_sha": "8cfa6fa245ea7b497a78e75c26ee88713a0d2449"
+    },
+    {
+      "path": "apps/api/src/delivery-orders/delivery-order-print.service.ts",
+      "size": 5073,
+      "sha256": "8877bd5d68db1694ce341fa34c74ad38a8fa4b1efff8f3494e3c41e8fad58dcc",
+      "git_blob_sha": "6bd0410c561255c39d56d0d69dc88929c2335932"
+    },
+    {
+      "path": "apps/api/src/delivery-orders/delivery-orders.controller.ts",
+      "size": 4037,
+      "sha256": "8bfdffe95659b6f7c5078ffcdb4d1c6245cf84855c01be9e97cbaf905b930f02",
+      "git_blob_sha": "ee5a43e8d03af0b2e234f106d24f3c8c190144a2"
+    },
+    {
+      "path": "apps/api/src/delivery-orders/delivery-orders.service.ts",
+      "size": 12133,
+      "sha256": "81b55f5645c39200d0ab0619dbd56a4be1d7e192551dcaadd7fe6d8d9d016bfc",
+      "git_blob_sha": "23a5f1977c4092a9258f7037a01b54ad0c74adf1"
+    },
+    {
+      "path": "apps/api/src/common/guards/roles.guard.ts",
+      "size": 780,
+      "sha256": "27fa59e2370b89e85137d47527841dba4838125cbc83c0f03fdd644ab94b0c31",
+      "git_blob_sha": "776d615246a56c8ea4813577f7603eebf66683b7"
+    },
+    {
+      "path": "apps/api/src/common/guards/jwt-auth.guard.ts",
+      "size": 1278,
+      "sha256": "a5842cb1306eba7efc7b3927bb0ae84087ac0d445df7ed9fade889032cef67de",
+      "git_blob_sha": "59a605b95388824291ab34c91c6909a1aa155546"
+    },
+    {
+      "path": "apps/api/src/common/decorators/current-user.decorator.ts",
+      "size": 452,
+      "sha256": "0c3f608bdeedcb8ed6ba6ea1bc188a4162f80802816b05b85c897ca6857f7d41",
+      "git_blob_sha": "893e351017a1e0831c751fffe02c6f6e469c281d"
+    },
+    {
+      "path": "apps/api/src/common/decorators/roles.decorator.ts",
+      "size": 202,
+      "sha256": "c0cc07758b8a3f0f110f2564bd57210c7bdb878b412253cc87449a9e8c35d1bf",
+      "git_blob_sha": "ec0c377c6fc082adc8138ee887a18bff3bcf036e"
+    },
+    {
+      "path": "apps/api/src/common/interceptors/bigint-serializer.interceptor.ts",
+      "size": 779,
+      "sha256": "f13d88a607615479df80e1c3ade4803ee614320a8c93425d8afc34d162a09755",
+      "git_blob_sha": "8d8ebba997f8d513785bdc795ea172d83981d1f4"
+    },
+    {
+      "path": "apps/api/src/purchase-orders/purchase-orders.controller.ts",
+      "size": 1326,
+      "sha256": "792fc07ae65dd0fc67598d0062d812c55ca3d9b0268ecd752736ebb38bbb78f7",
+      "git_blob_sha": "f31c1db4f2cc7c6424de267878e8e0d1ee3197fa"
+    },
+    {
+      "path": "apps/api/src/purchase-orders/purchase-orders.service.ts",
+      "size": 10041,
+      "sha256": "4147ca63eaf13dbdabf235458a254eef488cb1413702ed85e735fa044a505bad",
+      "git_blob_sha": "addb83550314bce504db8b8cf88f2be5e9413b10"
+    },
+    {
+      "path": "apps/api/src/purchase-orders/dto/update-purchase-order.dto.ts",
+      "size": 206,
+      "sha256": "06f6f7f50de5102f406bf37c36eb18aac563d3e81b6507c1013041d4d442d154",
+      "git_blob_sha": "3e319dd4f8f2d18248ca6ef3f2c7be79912ecc69"
+    },
+    {
+      "path": "apps/api/src/purchase-orders/dto/create-purchase-order.dto.ts",
+      "size": 2052,
+      "sha256": "3e66c6e86d9051c3091f1ca228eb1713dfbb7a4fbfd9f271f9e262f69b83800b",
+      "git_blob_sha": "53cd0769f578070bbf46793894346412775eba8f"
+    },
+    {
+      "path": "apps/api/src/purchase-orders/purchase-orders.module.ts",
+      "size": 590,
+      "sha256": "66ff8a06dd6386b5494120f7b0fae69a03db391f0ffd51da20b478892c13796f",
+      "git_blob_sha": "48acc7498e8ad3368975a9a13f3be8ae07747172"
+    },
+    {
+      "path": "apps/api/src/prisma/prisma-adapter.ts",
+      "size": 793,
+      "sha256": "40cd2e7bd25ed8839e854fc1e429ae8e6b148d1068da59eb20ffdeee66613d5b",
+      "git_blob_sha": "0f0c7756cf4de1c930bf0a3b81ff4280cd9befd8"
+    },
+    {
+      "path": "apps/api/src/prisma/prisma.service.ts",
+      "size": 478,
+      "sha256": "92bbc723543b3ca2308daa16f59ec16b6d4dc65401093f73603302b4d7093b1c",
+      "git_blob_sha": "0658793ed7afdb907640d7bf1869353ce389e022"
+    },
+    {
+      "path": "apps/api/src/prisma/prisma-engine.ts",
+      "size": 1143,
+      "sha256": "11ab8c77cf17fb5f7526ca1e1168a38f8c9e1532d420dd196687be2314b6b85b",
+      "git_blob_sha": "0a7e8fc26403e5c22a245eedb3e3b0ffcf379b15"
+    },
+    {
+      "path": "apps/api/src/prisma/prisma.module.ts",
+      "size": 210,
+      "sha256": "9223a0889abb0669020e94a9b8c1e68274cdc05533c1f79d84fe516450e94ebd",
+      "git_blob_sha": "7207426f6047cbbb1a10ea157db19a17442f4b0b"
+    },
+    {
+      "path": "apps/api/src/project-origins/project-origins.service.ts",
+      "size": 1819,
+      "sha256": "d636eb2ba886f48fccf9c1f9a40b41af3209c898a9b99b927b07272253952370",
+      "git_blob_sha": "2a8864a51974e05c5e4005fa230f7e17ebcabc09"
+    },
+    {
+      "path": "apps/api/src/project-origins/dto/upsert-project-origin.dto.ts",
+      "size": 482,
+      "sha256": "c181ee565563af86d728305d0862baf68b2b6beb4f092429ec3114c18db09e68",
+      "git_blob_sha": "49592414c3e2df7e4f6faec3c584743d3a412b22"
+    },
+    {
+      "path": "apps/api/src/project-origins/project-origins.module.ts",
+      "size": 484,
+      "sha256": "9e61469e1375d4f848a947b9826c4ea469080d62c4041ba03044b6f8b4558daa",
+      "git_blob_sha": "a3c41e04c92b8c0eadafcc19b4d061b14a5c21ec"
+    },
+    {
+      "path": "apps/api/src/project-origins/project-origins.controller.ts",
+      "size": 886,
+      "sha256": "04fe649fcff9557e637cf44d98fdf999d33a73d08ea5df00c22195e7e8ec9293",
+      "git_blob_sha": "7a834ed503c663e069312385cc1bcab3149f0638"
+    },
+    {
+      "path": "apps/api/src/company-profile/company-profile.controller.ts",
+      "size": 1030,
+      "sha256": "9144136830b218f2e1230e63a1f9e10959c53f40b0c98b37d7b6802ad8492e45",
+      "git_blob_sha": "c1de95ff26a53bc51a799fa1f7761d743837d867"
+    },
+    {
+      "path": "apps/api/src/company-profile/company-profile.module.ts",
+      "size": 388,
+      "sha256": "d687dfc2cacddac4c9c4ccd90ca76d0fa0a8e7eab72accd04995768971f8d02b",
+      "git_blob_sha": "b68b05f6ed92c562850d76937c162a32fe66e97c"
+    },
+    {
+      "path": "apps/api/src/company-profile/company-profile.service.ts",
+      "size": 1283,
+      "sha256": "beef9743a3867ce5d173cca875058c3e21b4c09db8bbbdba6fdd6ae0a2d2e12e",
+      "git_blob_sha": "f9098ec26e1098145c5f4a9e5b709c32b89d0026"
+    },
+    {
+      "path": "apps/api/src/company-profile/dto/update-company-profile.dto.ts",
+      "size": 1155,
+      "sha256": "7bb2902cb25b1ff234c55fef6facc536fe426c2af50d5ce1623e8c82e9c49fd0",
+      "git_blob_sha": "d6cb4b2b0a25fd60420a91261f32ea0eae307826"
+    },
+    {
+      "path": "apps/api/src/payments/payments.service.ts",
+      "size": 2757,
+      "sha256": "70e6983e062fa73f371cfc3044b10610fc9bf6c175d55219a29bb87dcdfbfc2e",
+      "git_blob_sha": "94b4ab442622336d4aa5f4ba25ce9487493daf7e"
+    },
+    {
+      "path": "apps/api/src/payments/dto/create-payment.dto.ts",
+      "size": 531,
+      "sha256": "c4fd1de15a13cb5215a77f532e8e79b3c407c5f3db1a0ad4f27f0555d3ddb3b4",
+      "git_blob_sha": "5e2bc18a32f43ab44e0742d4696d163cf39a1c03"
+    },
+    {
+      "path": "apps/api/src/payments/payments.controller.ts",
+      "size": 831,
+      "sha256": "06077c4def6769774f36f21a5c011338620a15414dcf10ae9195816187571ef7",
+      "git_blob_sha": "3fa9043485241275c13d63b517ec36435f79def6"
+    },
+    {
+      "path": "apps/api/src/payments/payments.module.ts",
+      "size": 440,
+      "sha256": "64ffff50e74dd35c1c5a2ea9920c3675862a74a841328d4714ca7cd28e0725a7",
+      "git_blob_sha": "90750443230b80dfd8c0d4dc1d87ad46741f1072"
+    },
+    {
+      "path": "apps/api/src/receiving-documents/receiving-documents.module.ts",
+      "size": 552,
+      "sha256": "1ad4048b04d3b02a2f70d7bb722409e404a9a23c22a4076ec5d19000c2f18af2",
+      "git_blob_sha": "805ca5e31060deef04c9947bddc68059194771f5"
+    },
+    {
+      "path": "apps/api/src/receiving-documents/receiving-documents.service.ts",
+      "size": 4302,
+      "sha256": "4837a7d81e7d97d810439b7a6ff65c8250512c58a0fb19ee3a1d5a8faaf0918b",
+      "git_blob_sha": "e64bb6fabbd0bb7fe0a9a0d86b3d5220c7268ade"
+    },
+    {
+      "path": "apps/api/src/receiving-documents/dto/create-receiving-document.dto.ts",
+      "size": 559,
+      "sha256": "116cd24cb9833d6dd176f9994383c7b0a783860037ce5be2f9714fb3554a857d",
+      "git_blob_sha": "8b301ff363cc64ec2bdc2af509754f8531e3a827"
+    },
+    {
+      "path": "apps/api/src/receiving-documents/receiving-documents.controller.ts",
+      "size": 1358,
+      "sha256": "9174f14e2abc5ea677e24e9f2c8f5e4382d3f0aef61b0c5684e4956f6d703883",
+      "git_blob_sha": "ade8a21238d637f660a0e89cb5afdb95445a3b2c"
+    },
+    {
+      "path": "apps/api/src/main.ts",
+      "size": 3030,
+      "sha256": "f62b23371d5fd8ab95521a2d921521b48bc281522b603b59a74abb1cfc784b3d",
+      "git_blob_sha": "51cd073e02f886cbaa3c24ea6f2c17db1896aef3"
+    },
+    {
+      "path": "apps/api/src/auth/dto/login.dto.ts",
+      "size": 172,
+      "sha256": "8255f4f6300e7c5138f4376de3d91a34f7b34e8398a1e535e8a2dbd219b076ef",
+      "git_blob_sha": "ba45ea1cc7c93bfe0b92a98581f54384e09f057c"
+    },
+    {
+      "path": "apps/api/src/auth/auth.service.ts",
+      "size": 1075,
+      "sha256": "1b7554994023464e3a03ac49fccd7207caecedd0d4bb4fd76a24f42de0a7c482",
+      "git_blob_sha": "95803e9bd27ed2ac814ffe79e74dd743a3bdeacb"
+    },
+    {
+      "path": "apps/api/src/auth/auth.module.ts",
+      "size": 801,
+      "sha256": "42489cdc7a06539c45fc77d18bc1fbe9c480756cbfa38869e0a80922b0166cb2",
+      "git_blob_sha": "f88483634c81508c59f7418e6e6b75d41d0d0fe2"
+    },
+    {
+      "path": "apps/api/src/auth/auth.controller.ts",
+      "size": 624,
+      "sha256": "5b96295556eea61caa7aa4b485bfc4cfd674e8f0dac32ba47e9c9463ffae7195",
+      "git_blob_sha": "e79b7a7f755470243744c538939e0efa86f69a4b"
+    },
+    {
+      "path": "apps/api/src/config/env.validation.ts",
+      "size": 1741,
+      "sha256": "be921cea70ecbeabd2ed09a00f017661b14a1ff229869ccbd97fa45068309ff2",
+      "git_blob_sha": "cb0e553ac687274acfe38ba527d4e47abf501352"
+    },
+    {
+      "path": "apps/api/src/quotations/quotations.service.ts",
+      "size": 17809,
+      "sha256": "dd96a12333bc0fdebb4312c83afac54d753efa9ceaf989a26f9c47c6482ede67",
+      "git_blob_sha": "98ac5bd50e5a81c5e6d0a44382661c8877350638"
+    },
+    {
+      "path": "apps/api/src/quotations/dto/update-quotation.dto.ts",
+      "size": 189,
+      "sha256": "0db17a569f37c59daf6f21cd80dbcecccc15ab9a9e14d0ca2647a0902088e469",
+      "git_blob_sha": "5662c828529e893a36caf79816bee7416b14094e"
+    },
+    {
+      "path": "apps/api/src/quotations/dto/create-quotation.dto.ts",
+      "size": 2166,
+      "sha256": "9e68f2e57ce30da9ef5214e342873f489e26d7e274e87d828052fdbac0e6089a",
+      "git_blob_sha": "a537333c5939bbc7aca05409789fd7eeadb4cf1e"
+    },
+    {
+      "path": "apps/api/src/quotations/quotation-print.service.ts",
+      "size": 8770,
+      "sha256": "0b556b9eb11703c40793e4626e804a1c0899a532957f0d8f3e2efd9121914259",
+      "git_blob_sha": "d2c814628826f7a8f68acafec5a3518f107c23ee"
+    },
+    {
+      "path": "apps/api/src/quotations/quotations.controller.ts",
+      "size": 3999,
+      "sha256": "5cbbb6e5f3f2a3bb60beb9dd5c6bfae741a8ccbe8641e5a59b373656485b75dc",
+      "git_blob_sha": "27c6b4336cfb94900a74ed20119c2626c747f0d7"
+    },
+    {
+      "path": "apps/api/src/quotations/quotations.module.ts",
+      "size": 728,
+      "sha256": "094f913b8b239c326c213f5c8b3db08d69bc44a1c65f8e0e38d7542cdc3e56ca",
+      "git_blob_sha": "1a0bab9ac5e63abdca8623f942a2c84526d4684c"
+    },
+    {
+      "path": "apps/api/src/activity-logs/activity-logs.module.ts",
+      "size": 408,
+      "sha256": "8ae3e8953b835a135ed881407337b73d76bf96df018bc2e0f5843c96f6ac30ba",
+      "git_blob_sha": "004b1655f03288c5d93c06fb0df10809f1366b6c"
+    },
+    {
+      "path": "apps/api/src/activity-logs/activity-logs.controller.ts",
+      "size": 480,
+      "sha256": "117ad99c80e068398337b477ad3518fb8d65325b2582e27f2151881a49d1882e",
+      "git_blob_sha": "4ee2eda810dd9f48ba671cfa37d939b83bdb41b3"
+    },
+    {
+      "path": "apps/api/src/activity-logs/activity-logs.service.ts",
+      "size": 865,
+      "sha256": "f0bbcdc0b7e405ce8b5cb90034a70f16b1edae0a5206cf975ce96aeb7b3bf235",
+      "git_blob_sha": "f06a77b86704a0ae2f2c6f128943e4d9b6d1913d"
+    },
+    {
+      "path": "apps/api/src/receipts/receipts.controller.ts",
+      "size": 2998,
+      "sha256": "515255c93d6b631fa7ef911792a514ba5c429202082ec590a87baee5664b83f3",
+      "git_blob_sha": "fb9149736c6755dcbd0138c76bf48da357ee9693"
+    },
+    {
+      "path": "apps/api/src/receipts/dto/create-receipt.dto.ts",
+      "size": 199,
+      "sha256": "ad30a087645a5af0d5b7760c2f6d5f2fda428aa514d302581210001695e59252",
+      "git_blob_sha": "dde22c938853fb5c94ba678ec74a56a6f27bee30"
+    },
+    {
+      "path": "apps/api/src/receipts/receipt-print.service.ts",
+      "size": 3790,
+      "sha256": "4780935941a361498090520ad4f7841bbd264e7623d4151557d1ed9d9d020137",
+      "git_blob_sha": "2af0ff71b540cbdac1c2166f1e8e7c45ad23fd61"
+    },
+    {
+      "path": "apps/api/src/receipts/receipts.module.ts",
+      "size": 773,
+      "sha256": "daf534151633a1531c72da4c4320c43d7b1630612692df99894d4d64a9ad4414",
+      "git_blob_sha": "146c1dc7cae98de4419913aca9e7443790a1a779"
+    },
+    {
+      "path": "apps/api/src/receipts/receipts.service.ts",
+      "size": 6418,
+      "sha256": "cab116654ed37d2b46d0eb9413d7b200f4b2c434d9d13be805799fec8c4b9878",
+      "git_blob_sha": "01ae28b109f3aed13d54c680edf29dbd1ac5a7ec"
+    },
+    {
+      "path": "apps/api/src/pdf/pdf.service.ts",
+      "size": 4435,
+      "sha256": "a66db02eff71f5d62fdc2153a83921dda4ee88761b48b9fb40f1f56f2058838b",
+      "git_blob_sha": "cd52a1a30624e6561b7280802cea4760b2ceb86f"
+    },
+    {
+      "path": "apps/api/src/pdf/pdf.module.ts",
+      "size": 190,
+      "sha256": "1418c93137323ade4dd3a50cce31f690e07f3db6d76176348893b7061bc8a339",
+      "git_blob_sha": "1974f5ddc5baf001f7f3792ddda7f7fee1aee784"
+    },
+    {
+      "path": "apps/api/src/invoices/invoices.service.ts",
+      "size": 14914,
+      "sha256": "80121c62d9ebd2f840fcc14db657f05bb4af50884d86723d65adf4cbbcfab13f",
+      "git_blob_sha": "7cfa13ed88d8b25d1d0e3c3e59c3bdd04a23c1e4"
+    },
+    {
+      "path": "apps/api/src/invoices/invoices.controller.ts",
+      "size": 4241,
+      "sha256": "1a386b4dae539147df3dd6d93f45283f0f60f2272d084cd4f67b8e371d3ca201",
+      "git_blob_sha": "3728cb3fcdf0eeb358e510bce4b9b765160395c1"
+    },
+    {
+      "path": "apps/api/src/invoices/invoice-print.service.ts",
+      "size": 7237,
+      "sha256": "63432a0703e7a608960795eac71797a708d73c1cd88cafd5c8a8ce51c254d300",
+      "git_blob_sha": "032b438c82f11e9a16589e414552c664adce5612"
+    },
+    {
+      "path": "apps/api/src/invoices/dto/create-invoice.dto.ts",
+      "size": 923,
+      "sha256": "4bdecdb82960b74dcf6cca58efc5188780df02054998a0eee65ae3ab08df60bd",
+      "git_blob_sha": "656c3590ef3641eea0bb137fca09bf26e115a30f"
+    },
+    {
+      "path": "apps/api/src/invoices/invoices.module.ts",
+      "size": 930,
+      "sha256": "34438144db667b9484ff950f3e90fbae674e9f141556a7978134d1cd566aebc7",
+      "git_blob_sha": "8eccf567efd79c24baa00cc2f5df369f1cdeb1ea"
+    },
+    {
+      "path": "apps/api/src/invoices/billing-package-pdf.service.ts",
+      "size": 5183,
+      "sha256": "198d64cc8c735887f0aac592048b56036285020a1992bcce42fd3b05c81142b0",
+      "git_blob_sha": "5ccec75708d8bc957294a04d7ae94a104595c39d"
+    },
+    {
+      "path": "apps/api/src/app.module.ts",
+      "size": 2126,
+      "sha256": "79d782644c29b8b793d9fc295e271c3ca366a026966f66d053c9372be8e1848c",
+      "git_blob_sha": "e448739d027946409a738547054cbbde7e9199d8"
+    },
+    {
+      "path": "apps/api/src/tax-documents/dto/upload-tax-document.dto.ts",
+      "size": 292,
+      "sha256": "0fc33245757d0658aafa8e4467c34272e86cbef920bba9ab4eadd7056e9d50d0",
+      "git_blob_sha": "89e482523dad055a3ea942b927a3aeadca44c128"
+    },
+    {
+      "path": "apps/api/src/tax-documents/tax-documents.controller.ts",
+      "size": 1141,
+      "sha256": "5477cfaccb914d5f6621c7bdec167dc11fd6ee08e9861114baf8c4f172c91c89",
+      "git_blob_sha": "5fbf1666063a3a743b79f07edded33d430f289ad"
+    },
+    {
+      "path": "apps/api/src/tax-documents/tax-documents.module.ts",
+      "size": 552,
+      "sha256": "2a81bc94fdd4039bec3c307dfbb0526830263e63a6b11e3751fdd9dd034efd16",
+      "git_blob_sha": "a1086b7d46bd8a7a00e32690a5099f50d257fffc"
+    },
+    {
+      "path": "apps/api/src/tax-documents/tax-documents.service.ts",
+      "size": 3365,
+      "sha256": "2cbfb6d2cffc2a8cf3fd9e3f87269a6b94008c61b437ffb3ea0494bc5dcb2b0d",
+      "git_blob_sha": "10cd1a23264b3694c2807a263d7c2696e9e7a753"
+    },
+    {
+      "path": "apps/api/package.json",
+      "size": 1214,
+      "sha256": "f1970b2cf2b974af14f85e90764efb5b1930edc899d23c53112bd8852dac0225",
+      "git_blob_sha": "f9af4861837f578f2920435b23dca06c6dd9520b"
+    },
+    {
+      "path": "apps/api/tsconfig.build.json",
+      "size": 107,
+      "sha256": "711082247b195d1222a4ab2db3db6327e9e570a879e3df824289ec4980fc73da",
+      "git_blob_sha": "1bdba3be1290359659669ded2a193581c68c0071"
+    },
+    {
+      "path": "apps/api/tsconfig.json",
+      "size": 455,
+      "sha256": "efe9cddcf708e1ddd2ba49552d849938d99bafc3e8d27faa9d9f226d75010455",
+      "git_blob_sha": "b834b274bbc6e32ae9ddf399100d6ce797a40fd8"
+    },
+    {
+      "path": "deploy/cpanel/preflight.cjs",
+      "size": 921,
+      "sha256": "d076bd8ec81dca93e05c67eece25a52a6703a832ca466a6b44dfa411ea125db8",
+      "git_blob_sha": "be944ff2653854a1197af8e6b89020e9c04cbbe0"
+    },
+    {
+      "path": "package.json",
+      "size": 1892,
+      "sha256": "ef97e1fa32ea7ed017157d4ea0faf61aa03e36429d22ad1db2ed6d54ebf61e90",
+      "git_blob_sha": "e4d6cd2e3ab653d0ed943511fc6e78c585cd608d"
+    },
+    {
+      "path": ".nvmrc",
+      "size": 3,
+      "sha256": "f14b4987904bcb5814e4459a057ed4d20f58a633152288a761214dcd28780b56",
+      "git_blob_sha": "2bd5a0a98a36cc08ada88b804d3be047e6aa5b8a"
+    }
+  ]
+}

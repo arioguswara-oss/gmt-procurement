@@ -154,3 +154,31 @@ Progres source tidak disamakan dengan hosting. READY TO DEPLOY hanya jika syntax
 - **BLOCKERS:** secure transport of 126 source file bytes into GitHub Private (connector text-only; don't use public links or user secrets), manual secret/PII review, root lockfile reconciliation, isolated compile/regression, project-level auth tests, hosting verification.
 - NEXT: scoped source import when secure private transfer becomes available; no forced production changes. Hermes CI 8/8 prebuild synthetic PASS and idle PASS earlier, not evidence of full build.
 - Status: Overall Source/Foundation verified local import bundle, source GitHub import PENDING. Module Progress no new features. Source/Test static/provenance inspection, full build PENDING. Hosting NOT VERIFIED. Deploy NOT READY. LOCK NO.
+
+
+## P0-IMPORT source push checkpoint — 2026-10-19 (actual GitHub source commit)
+- Rio requested execution without repeating docs-only cycles. Branch `chatgpt/procurement-source-import-20261019` created from reviewed PR #4 source gate at `a0ef363f41def89c105867092d8dfafd9252490f`.
+- **ACTUAL IMPORT:** 60 of 126 source files from locally verified `GMT_Procurement_SOURCE_IMPORT_REVIEW_20261019.zip` staged to GitHub private on this new branch. Commits `8e199e24bba57a452eacc41d6b6ec8571da9eefb`, `9d18d9e74c77e0f702bb9438b5514052c7bf6f75`, `cb2cf11fc7d01a8632a1340272bfd1eedeb06cf2`; PR #7 DRAFT: https://github.com/arioguswara-oss/gmt-procurement/pull/7.
+- **VERIFICATION:** Tree API reports exactly **60 added app/deploy/root source files**, matching expected ZIP file Git blob hashes via aggregate XOR `5ec872d24d9a43e9702a394feea4ec5166c51164`; tree response untruncated. Total imported payload `30.519` bytes, source identity check **PASS for this subset only**.
+- No existing GitHub `README.md`, `.gitignore`, workflows or other agents' files overwritten. No `.env`, node_modules, storage, uploads, migration SQL or production data.
+- **Still pending:** 66 larger source files (291.318 bytes), notably Prisma schema and main services/frontend features. Do NOT attempt install/build/deploy on incomplete tree; no app regression/CI attempted. Root lockfile missing in original baseline.
+- Source/Foundation: 60/126 **actual imported**, remaining 66 PENDING; Module: existing unchanged, no new business features; Source/Test: 60-file blob identity check PASS, full build/regression PENDING; Hosting NOT VERIFIED; Deploy NOT READY; LOCK NO.
+- NEXT: finish exact remaining 66 source imports from original locally verified package with secure file transfer, verify 126/126 Git tree hashes; only after full import, reconcile dependency lockfile and design isolated build.
+
+
+## P0-IMPORT completion and local build — 2026-10-19
+- Owner Codex; import DONE_SOURCE under Rio continuation mandate. SHA f0ad54ef5484f64d9be1609515c7cac841650a90; 126/126 exact source blobs, remaining 0; other lanes unchanged.
+- Root lock generated; npm ci ignore-scripts, API/web typecheck/build, 17 Python gate and 10 DB-free regression tests PASS.
+- Evidence: docs/SOURCE_IMPORT_BUILD_EVIDENCE_20261019.md and source manifest. Old review bundle unavailable; reconstructed directly from verified original ZIP.
+- Blockers: dependency audit 11 high + 1 moderate; remote CI failed without logs; Hermes gmtci CPU/RAM limits unlimited, no heavy VPS build.
+- Overall Source/Foundation: import DONE_SOURCE; Module: unchanged baseline; Source/Test: local PASS, remote/security open; Hosting NOT VERIFIED; Deploy NOT READY; LOCK NO.
+- Next: dependency remediation review, dedicated gmtci resource limits and isolated Linux build. No SANRO environment, merge/deploy/migration/seed/db push.
+
+
+## P0-IMPORT update — Hermes isolated build and no-auto-Action policy (2026-10-19)
+- Latest PR #7 head before this checkpoint: `3d8a31434e772e0010c32dc49904c4539132288e`; previous app-test commit `e61ba58b5e9c9eba3318195dc72581b98cb7e513`. The only change between those commits is `.github/workflows/source-guard.yml`, now `workflow_dispatch` only. No automatic PR/push workflow runs; no workflow run exists for the latest commit. Do not manually dispatch the hosted `ubuntu-latest` job for this project.
+- GitHub Actions run `39260887866` was rerun once, but GitHub reported it was not started because of account payments/spending limit. The job had no runner steps/logs; this was not an app test failure. Do not retry it.
+- **Hermes app validation completed on-demand as `gmtci`**, in Bubblewrap, against app commit `e61ba58b5e9c9eba3318195dc72581b98cb7e513`. Rio-provided resource preflight: CPU `100000 100000` (1 CPU), memory high `1610612736`, memory max `2147483648`, swap max `0`, PIDs max `128`; preflight passed. No SANRO service, project, database, or credentials used.
+- Node `22.22.1`, npm `9.2.0`, Python `3.14.4`, Bubblewrap `0.11.1`. `npm ci --ignore-scripts` (530 packages) and explicit Prisma Client generate (6.19.3, dummy unreachable DB URL) passed. API/Nest and web/Vite build, 10 DB-free Node regressions, 17 Python gate tests, tracked source guard, and 126/126 source-manifest verification passed. No database connection, migration, seed, db push, or deployment. Build peak memory reported 540.5 MiB; cleanup left the branch clean after removing only generated `scripts/__pycache__/`.
+- **Still open:** dependency audit remains 11 high + 1 moderate. Lock resolves Prisma/adapter 6.19.3, nested MariaDB 3.4.5, Puppeteer Core 24.43.1 and affected transitive packages. Audit remediation points to major-version upgrades; do not use `npm audit fix --force` or treat build pass as security clearance. Full DB/E2E and Chromium PDF tests remain unrun. PR stays DRAFT; no merge/deploy/production database operation.
+- Next: review a scoped, testable dependency-remediation path; keep app checks on Hermes `gmtci` and avoid GitHub-hosted Actions.
