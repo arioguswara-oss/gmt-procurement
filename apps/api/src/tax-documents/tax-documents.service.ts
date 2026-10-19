@@ -4,6 +4,7 @@ import { ActivityLogsService } from '../activity-logs/activity-logs.service';
 import { DocumentsService } from '../documents/documents.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { UploadTaxDocumentDto } from './dto/upload-tax-document.dto';
+import { assertTaxInvoiceFile } from '../documents/tax-invoice-file-validator';
 
 @Injectable()
 export class TaxDocumentsService {
@@ -25,6 +26,7 @@ export class TaxDocumentsService {
 
   async upload(invoiceId: bigint, dto: UploadTaxDocumentDto, file: Express.Multer.File, userId: bigint) {
     if (!file) throw new BadRequestException('File Faktur Pajak wajib diupload');
+    assertTaxInvoiceFile(file); // reject invalid scan BEFORE allocating taxDocument
     const invoice = await this.prisma.invoice.findUnique({ where: { id: invoiceId }, include: { project: true } });
     if (!invoice) throw new NotFoundException('Invoice tidak ditemukan');
     if (invoice.status !== InvoiceStatus.DRAFT && invoice.status !== InvoiceStatus.WAITING_TAX_INVOICE && invoice.status !== InvoiceStatus.READY_TO_FINALIZE) {
