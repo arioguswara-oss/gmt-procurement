@@ -154,3 +154,13 @@ Progres source tidak disamakan dengan hosting. READY TO DEPLOY hanya jika syntax
 - **BLOCKERS:** secure transport of 126 source file bytes into GitHub Private (connector text-only; don't use public links or user secrets), manual secret/PII review, root lockfile reconciliation, isolated compile/regression, project-level auth tests, hosting verification.
 - NEXT: scoped source import when secure private transfer becomes available; no forced production changes. Hermes CI 8/8 prebuild synthetic PASS and idle PASS earlier, not evidence of full build.
 - Status: Overall Source/Foundation verified local import bundle, source GitHub import PENDING. Module Progress no new features. Source/Test static/provenance inspection, full build PENDING. Hosting NOT VERIFIED. Deploy NOT READY. LOCK NO.
+
+
+## P0-IMPORT source push checkpoint — 2026-10-19 (actual GitHub source commit)
+- Rio requested execution without repeating docs-only cycles. Branch `chatgpt/procurement-source-import-20261019` created from reviewed PR #4 source gate at `a0ef363f41def89c105867092d8dfafd9252490f`.
+- **ACTUAL IMPORT:** 60 of 126 source files from locally verified `GMT_Procurement_SOURCE_IMPORT_REVIEW_20261019.zip` staged to GitHub private on this new branch. Commits `8e199e24bba57a452eacc41d6b6ec8571da9eefb`, `9d18d9e74c77e0f702bb9438b5514052c7bf6f75`, `cb2cf11fc7d01a8632a1340272bfd1eedeb06cf2`; PR #7 DRAFT: https://github.com/arioguswara-oss/gmt-procurement/pull/7.
+- **VERIFICATION:** Tree API reports exactly **60 added app/deploy/root source files**, matching expected ZIP file Git blob hashes via aggregate XOR `5ec872d24d9a43e9702a394feea4ec5166c51164`; tree response untruncated. Total imported payload `30.519` bytes, source identity check **PASS for this subset only**.
+- No existing GitHub `README.md`, `.gitignore`, workflows or other agents' files overwritten. No `.env`, node_modules, storage, uploads, migration SQL or production data.
+- **Still pending:** 66 larger source files (291.318 bytes), notably Prisma schema and main services/frontend features. Do NOT attempt install/build/deploy on incomplete tree; no app regression/CI attempted. Root lockfile missing in original baseline.
+- Source/Foundation: 60/126 **actual imported**, remaining 66 PENDING; Module: existing unchanged, no new business features; Source/Test: 60-file blob identity check PASS, full build/regression PENDING; Hosting NOT VERIFIED; Deploy NOT READY; LOCK NO.
+- NEXT: finish exact remaining 66 source imports from original locally verified package with secure file transfer, verify 126/126 Git tree hashes; only after full import, reconcile dependency lockfile and design isolated build.
