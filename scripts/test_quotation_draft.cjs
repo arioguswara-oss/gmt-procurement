@@ -87,3 +87,33 @@ test('concurrent Mark Sent rejects PATCH inside transaction before item deletion
   assert.equal(updated, false);
   assert.equal(audit, false);
 });
+
+test('DRAFT PATCH clears a previously set Valid Until date with explicit null', async () => {
+  let saved;
+  const service = new QuotationsService({
+    quotation: { findUnique: async () => quote('DRAFT') },
+    $transaction: async (fn) => fn({
+      quotation: {
+        updateMany: async () => ({ count: 1 }),
+        update: async ({ data }) => { saved = data; return { ...quote(), ...data }; },
+      },
+    }),
+  }, { write: async () => {} });
+  await service.update(11n, { validUntil: null }, 5n);
+  assert.equal(saved.validUntil, null);
+});
+
+test('DRAFT PATCH leaves Valid Until unchanged when field is omitted', async () => {
+  let saved;
+  const service = new QuotationsService({
+    quotation: { findUnique: async () => quote('DRAFT') },
+    $transaction: async (fn) => fn({
+      quotation: {
+        updateMany: async () => ({ count: 1 }),
+        update: async ({ data }) => { saved = data; return { ...quote(), ...data }; },
+      },
+    }),
+  }, { write: async () => {} });
+  await service.update(11n, { subject: 'Subject only' }, 5n);
+  assert.equal(saved.validUntil, undefined);
+});
