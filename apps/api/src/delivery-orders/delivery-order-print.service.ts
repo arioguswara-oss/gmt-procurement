@@ -40,15 +40,15 @@ export class DeliveryOrderPrintService {
     const watermark = row.status === 'DRAFT' ? '<div class="watermark">DRAFT</div>'
       : row.status === 'CANCELLED' ? '<div class="watermark">CANCELLED</div>' : '';
 
-    const body = matrix.map((item) => `
+    // Customer-facing signed DO must list ONLY quantities on this shipment.
+    // The full PO/previous/balance matrix remains in the internal /matrix endpoint.
+    const shippedItems = matrix.filter((item) => item.marked && item.thisDelivery.greaterThan(0));
+    const body = shippedItems.map((item) => `
       <tr class="${item.marked ? 'marked' : ''}">
         <td class="c">${item.lineNo}</td>
         <td class="description">${this.esc(item.description)}${item.marked && item.notes ? `<div class="item-note"><strong>Item Note:</strong> ${this.esc(item.notes)}</div>` : ''}</td>
-        <td class="r">${this.esc(item.qtyOrdered.toString())}</td>
+        <td class="r strong">${this.esc(item.thisDelivery.toString())}</td>
         <td class="c">${this.esc(item.uom)}</td>
-        <td class="r">${this.esc(item.previouslyDelivered.toString())}</td>
-        <td class="r strong">${item.marked ? '✓ ' : ''}${this.esc(item.thisDelivery.toString())}</td>
-        <td class="r">${this.esc(item.balanceAfterThisDo.toString())}</td>
       </tr>`).join('');
 
     return `<!doctype html>
@@ -62,8 +62,8 @@ export class DeliveryOrderPrintService {
 <div class="box"><div><span class="label">PO No.</span>${this.esc(row.purchaseOrder.poNo)}</div><div><span class="label">DO Date</span>${this.esc(this.date(row.doDate))}</div><div><span class="label">GMT Ref.</span>${this.esc(row.purchaseOrder.project.gmtReference)}</div></div>
 <div class="box"><div style="font-weight:700">Deliver To / Receiving Party</div><div>${this.esc(receiver.companyName ?? receivingParty.companyName)}</div><div>${this.esc(destinationAddress)}</div>${destinationCity ? `<div>${this.esc(destinationCity)}</div>` : ''}${row.deliveryContact ? `<div><span class="label">PIC</span>${this.esc(row.deliveryContact)}</div>` : ''}</div>
 </div>
-<table><thead><tr><th style="width:8mm">No</th><th>Description</th><th style="width:16mm">PO Qty</th><th style="width:14mm">UoM</th><th style="width:22mm">Previous</th><th style="width:23mm">This DO</th><th style="width:20mm">Balance</th></tr></thead><tbody>${body}</tbody></table>
-<div class="note"><strong>Delivery Matrix:</strong> Seluruh item PO ditampilkan untuk memantau pengiriman parsial. Kolom "This DO" menunjukkan jumlah pada surat jalan ini (✓ = dikirim).</div>
+<table><thead><tr><th style="width:12mm">No</th><th>Description of Goods Delivered</th><th style="width:24mm">Qty</th><th style="width:22mm">Unit</th></tr></thead><tbody>${body}</tbody></table>
+<div class="note">This Delivery Order confirms only the items and quantities delivered in this shipment. Remaining PO quantities are tracked separately.</div>
 ${row.notes ? `<div class="note"><strong>Delivery Notes:</strong> ${this.esc(row.notes)}</div>` : ''}
 ${seller.email ? `<div class="note">Please return a signed delivery confirmation to: ${this.esc(seller.email)}</div>` : ''}
 <div class="signatures"><div><div>Delivered By</div><div class="space"></div><div>${this.esc(seller.companyName ?? 'PT Gayuh Mandala Teknika')}</div><div>Name / Signature / Stamp</div></div><div><div>Received By</div><div class="space"></div><div>${this.esc(receiver.companyName ?? receivingParty.companyName)}</div><div>Name / Signature / Stamp</div></div></div>
