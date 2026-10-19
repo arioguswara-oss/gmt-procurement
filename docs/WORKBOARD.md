@@ -57,3 +57,100 @@ Progres source tidak disamakan dengan hosting. READY TO DEPLOY hanya jika syntax
 - scripts/source_guard.py dan 3 unittest: local PASS setelah fixture disesuaikan. GitHub Actions pada PR #1 berstatus FAILURE tanpa langkah job runner pada API. **CI BLOCKED — penyebab belum terverifikasi**; jangan klaim CI pass atau merge.
 - Tidak ada IMAP login, tidak ada panggilan Fonnte, tidak ada Drive write, perubahan database, ataupun hosting/deployment.
 - NEXT SAFE ACTION: verifikasi penyebab workflow gagal dari halaman GitHub Actions, lanjut audit source/seed terpisah, kemudian import source-only ke development branch setelah sanitasi dan review. Jangan merge main sampai seluruh gate sesuai.
+
+## Checkpoint P0-IMPORT — 2026-10-19 (source import preflight)
+- Lane P0-IMPORT owner ChatGPT: masih **IN_PROGRESS**, source lengkap belum masuk repository.
+- New PR #4 DRAFT: https://github.com/arioguswara-oss/gmt-procurement/pull/4
+- Source gate baru: `scripts/audit_source_zip.py` (read-only, fail-closed, tidak extract/upload/execute), `scripts/test_audit_source_zip.py` (empat unit test sintetik), `docs/SOURCE_IMPORT_GATE.md`.
+- Perbaikan keamanan: pemeriksaan path traversal, root ZIP ambigu, symlink, duplicate path, batas ukuran, binary, indikasi credential; hasil tidak mengungkap isi file.
+- **Status source baru: DONE_SOURCE; test belum dieksekusi**, karena tool pemrosesan lokal file sedang tidak tersedia. Jangan klaim tes PASS.
+- Source ZIP historis (konfirmasi Rio): `gmt-procurement.zip`, 200.209.381 bytes; verifikasi isi ulang belum terlaksana pada sesi ini; tidak perlu upload ulang sampai terbukti perlu.
+- Hermes: uji runner awal PR #3 PASS 3 tests dan IDLE PASS, bukan bukti PR #4 maupun full app CI.
+- Blockers: perlu akses byte ZIP untuk pemeriksaan ulang; test script gate harus dijalankan di sandbox Hermes sebelum import source; full build/test belum ada.
+- NEXT: verifikasi `python3 -m unittest discover -s scripts -p 'test*.py' -v` dan preflight ZIP pada lingkungan yang memperoleh source secara sah, lalu scoped source import; tidak ada merge/deploy/migration.
+- Hosting Verification: NOT VERIFIED. Deploy Readiness: NOT READY. LOCK: NO.
+
+## Checkpoint P0-IMPORT — Hermes ZIP Gate unit tests (2026-10-19, 04:09 WIB)
+- Screenshot Rio menunjukkan perintah pengujian `sudo -H -u gmtci bash` mengambil dua file langsung dari **commit terverifikasi** `668be644cf60cfdc3e3aab0f7a3b291466874bfd` menggunakan `git archive` ke direktori sementara.
+- Test dijalankan dengan `bwrap --unshare-user --unshare-pid --unshare-net` dan source test dimount read-only.
+- Keempat tes lulus: valid archive requires review, unsafe path fail closed, sensitive content blocked, runtime files never candidates.
+- Log akhir `Ran 4 tests ... OK` dan `ZIP_GATE_TEST_PASS`; prompt terminal kembali. Folder sementara diatur untuk dibersihkan via trap.
+- **FAKTA:** Gate unit tests **4/4 PASS** di Hermes. BUKAN bukti ZIP `gmt-procurement.zip` sendiri telah diaudit, diimpor, atau siap deploy.
+- **NEXT:** pemeriksaan sumber ZIP aktual dengan read-only preflight di lingkungan tepercaya yang memiliki ZIP tersebut. Tinjau hasil, lakukan manual secret review sebelum import source-only; jangan transfer ZIP berisi potensi credential ke VPS hanya demi tes.
+- Code/Test: ZIP gate tests PASS; build/regression aplikasi PENDING. Hosting: NOT VERIFIED. Deploy readiness: NOT READY. LOCK: NO.
+
+## Checkpoint P0-IMPORT — selective extraction preparation (2026-10-19)
+- `ClientError` pada alat pemrosesan Python/container ChatGPT masih terulang bahkan untuk operasi sederhana; bukan bukti ZIP asli rusak atau hosting Procurement bermasalah.
+- File baru scoped pada branch P0-IMPORT: `scripts/stage_source_zip.py` (local-only extraction of allowlisted source, requires archive SHA-256 match and `audit_source_zip.inspect` review-required), `scripts/test_stage_source_zip.py` (empat uji sintetik), serta `docs/SOURCE_IMPORT_GATE.md` diperbarui.
+- Skrip hanya dapat menulis ke **direktori lokal baru** yang dipilih operator (bukan Drive/hosting), tidak menjalankan kode ZIP, tidak mengunggah source, dan berhenti fail-closed jika audit ditolak.
+- **FAKTA:** code baru tersimpan di GitHub PR #4 DRAFT; **tes untuk `stage_source_zip.py` BELUM PASS/berjalan**, dan belum pernah dijalankan terhadap `gmt-procurement.zip` yang asli.
+- Previous evidence: audit gate test 4/4 PASS di Hermes, idle CI 0 proses saat dicek, tetapi tidak mencakup perubahan baru ini.
+- NEXT: jalankan 8 unit tests untuk gate+stager pada sandbox Hermes *on-demand* tanpa ZIP produksi; lalu lakukan source ZIP read-only scan dan selective staging hanya ketika file dapat diakses di lingkungan kerja lokal yang aman.
+- Source completeness: historical review package bukan artifact build; manifest/asset/lockfile/migration perlu review sebelum full import.
+- Source/Test: 4/4 gate tests PASS historis, stager tests PENDING, build PENDING. Hosting: NOT VERIFIED. Deploy Readiness: NOT READY. LOCK: NO.
+
+## P0-IMPORT checkpoint — 2026-10-19 (local source ZIP available again)
+- Source ZIP berhasil dibaca secara lokal dan CRC test PASS; 200.209.381 bytes; 37.761 entries; SHA256 cocok: `25ce1448015b34144dc16a67609a61f9ad5dd7ef70fd647b401c3d22caf06813`.
+- **IN_PROGRESS**: source-only candidate berhasil distage lokal (128 file / 322.562 bytes; compressed 128.217 bytes), candidate ZIP SHA256 `de2673a06b9975b722078c825a72c8c9d68e4e1edb5fffa3133d599bea38bbe5`, CRC PASS, manifest includes hashes.
+- Safety screening: no blocker with local allowlist and pattern scan, but secret/PII clearance manual PENDING. No `.env*`, storage, logs, uploads, third-party node_modules, historic patches, or seed scripts.
+- Syntax-only TypeScript parser **113/113 files, 0 diagnostics**; relative import resolution **333 references, 0 missing**. **NOT** complete build/CI/regression.
+- Dependency issue: no root lockfile in original ZIP; reproducibility/baseline dependency graph PENDING. Schema 24 Prisma models, 20 module files and 16 controller files inventoried.
+- **NOT DONE**: source import to GitHub, dependency build, environment/hosting verification, migrations, deployment, lock.
+- PR #4 remains DRAFT. GitHub docs/SOURCE_IMPORT_GATE.md now captures this checkpoint; source candidate remains private/local and is **NOT a deploy ZIP**.
+- NEXT: scoped manual security/completeness audit and lock strategy, then import to dedicated branch; no production/Drive writes, no SANRO changes.
+- Progress summary: Overall Source/Foundation = selective staging DONE_SOURCE but import IN_PROGRESS; Module Progress = audit only; Source/Test = syntax PASS / build PENDING; Hosting = NOT VERIFIED; Deploy = NOT READY; LOCK = NO.
+
+## Static module audit checkpoint — 2026-10-19
+- Ref: `docs/PROCUREMENT_FEATURE_BASELINE_AUDIT_20261019.md` added on P0-IMPORT branch. Source only, not runtime/hosting evidence.
+- **EXISTING in source:** project/inquiry, BusinessPartner/contacts, customer quotation revisions/status, PO, delivery/receiving, invoices/receipts/payments, documents/activity, auth/role guards.
+- **GAP CANDIDATES pending validation:** supplier-specific sourcing/onboarding, supplier RFQ lifecycle, supplier quotations/comparison, approval/bidding, Supplier Portal parked. `Quotation.rfqNo` existing must not be confused with supplier RFQ lifecycle.
+- No module implementation in this audit, no imports to GitHub, no business-rule/schema changes.
+- Module Progress: existing modules inventoried; supplier flow functional validation and requirements acceptance remain PENDING.
+- Source/Test: 113 TS/TSX parse PASS; 333 relative imports resolution PASS; full build/integration PENDING.
+- Hosting Verification: NOT VERIFIED. Deploy Readiness: NOT READY. LOCK: NO. Next: manual security/lockfile/build planning, then source import and scoped tests.
+
+## Architecture decision from Rio — 2026-10-19: AI Workspace for Mas Supri
+- **Koreksi scope penting:** diskusi kebutuhan Mas Supri **bukan** perintah mengimplementasikan semua poin sebagai fitur aplikasi. Procurement existing tetap source of truth transaksi; Google Drive Workspace untuk riset/analisis/katalog/spesifikasi/RFQ template/draft/komparasi pendukung, AI membantu Mas Supri.
+- Rujukan klasifikasi prioritas: `docs/PROCUREMENT_FEATURE_BASELINE_AUDIT_20261019.md` (bagian `Keputusan arsitektur Rio`). Supplier Portal masih ROADMAP. Fitur supplier RFQ/approval baru **tidak boleh langsung dibangun** hanya berdasarkan adanya gap di audit source.
+- AI tidak mengirim email/WA dan tidak mengganti status transaksi otomatis. Draft email hanya dengan kontrol dan review; Mas Supri yang mengirim.
+- Google Drive tetap **READ-ONLY by default** dan hanya `Gayuh Mandala Storage Share`, ID `1Zdui1O0CEA0YvQhSQu2P7Q6Tr2hqP_0A`; ancestry per file wajib diverifikasi, dilarang akses lintas Drive. Aktivasi write/integrasi butuh instruksi eksplisit Rio.
+- Jika perlu menghubungkan dokumen ke App, desain ID stabil, ACL, fail-closed dan audit trail terlebih dahulu; folder dapat dibaca bukan bukti integrasi tersedia.
+- **Penyesuaian prioritas:** P2-WORKSPACE = perumusan workflow/dokumen dan permission (BLOCKED_APPROVAL untuk setiap Drive write); P2-SUPPLIER = audit existing + klasifikasi workspace/app dahulu, bukan coding otomatis. P0-IMPORT tetap IN_PROGRESS tanpa benturan lane.
+- Status: Overall Source/Foundation staged lokal, import PENDING; Module Progress belum ada implementasi baru; Source/Test syntax PASS, full build/regression PENDING; Hosting NOT VERIFIED; Deploy NOT READY; LOCK NO.
+
+
+## P0-IMPORT dependency preflight — 2026-10-19
+- File baru `docs/BUILD_DEPENDENCY_SAFETY_20261019.md` mendokumentasikan entry `package.json` source ZIP v0.15.0, tidak menjalankan package scripts.
+- **DILARANG dieksekusi tanpa scoped approval/isolated DB:** `prisma:push:staging` (`prisma db push`), `prisma:seed`, `setup:staging` (termasuk seed), serta `apps/api` `prisma:migrate` (`migrate dev`).
+- Tidak ditemukan root dependency lockfile; jangan menjalankan `npm install` tak terkontrol, mengasumsikan build reproduksibel, atau memakai production DB. Tes build/regression masih PENDING.
+- GitHub source import tetap PENDING manual security/completeness; PR #4 tetap DRAFT, tidak ada deployment.
+- Status: Overall Source/Foundation source-only staged / import PENDING; Module Progress static audit; Source/Test syntax PASS, build PENDING; Hosting NOT VERIFIED; Deploy NOT READY; LOCK NO.
+
+
+## P0-IMPORT checkpoint — candidate verification 2026-10-19
+- Latest checkpoint details: `docs/SOURCE_CANDIDATE_VERIFICATION_20261019.md`. New code: `scripts/verify_source_candidate.py`, `scripts/test_verify_source_candidate.py` (same branch; PR #4 DRAFT).
+- **FAKTA TERVERIFIKASI** original ZIP SHA-256 unchanged (`25ce1448015b34144dc16a67609a61f9ad5dd7ef70fd647b401c3d22caf06813`); 37,761 entries; CRC PASS. Source candidate ZIP SHA-256 `de2673a06b9975b722078c825a72c8c9d68e4e1edb5fffa3133d599bea38bbe5`, 128 source files / 322,562 bytes.
+- **128/128 staged source files byte-identical** to original ZIP; manifest SHA/size per file MATCH; local content gate result `REVIEW_REQUIRED` with 0 findings. Only heuristics; manual secret/privacy review still needed.
+- Added six synthetic candidate verifier unit tests: **6/6 PASS locally** and compared GitHub blobs SHA to same locally tested bytes; source executable code from archive itself NOT run.
+- **NOT DONE**: 128 files app source are **not yet uploaded into GitHub**; dependency lock missing, full Nest/Vite build, regression, RBAC negative tests and hosting comparison all PENDING. Connector transfer of local source package requires another secure authorized path; no credential must be exposed.
+- P0-IMPORT lane remains **IN_PROGRESS**; no change to PR #5 docs-only Workspace lane, Telegram lane, Hermes server, SANRO or production.
+- Next: manual privacy/secret & import completeness review; secure private repo source import on dedicated branch; isolated build after dependency gating.
+- Reporting: Overall Source/Foundation candidate verification DONE_SOURCE, import PENDING; Module Progress no new feature; Source/Test candidate gate 6/6 PASS local, build/regression PENDING; Hosting NOT VERIFIED; Deploy NOT READY; LOCK NO.
+
+## P0-IMPORT static AST spot-check — 2026-10-19
+- Independent local read-only check with globally installed TypeScript parser: `113` TS/TSX files, `0` syntax diagnostics, `334` relative imports/re-exports/dynamic imports assessed, `0` unresolved. Counts differ from older 333 test because traversal criteria include dynamic import/re-export; no claim full module resolution against npm dependencies.
+- New verification script and test blobs identical to tested local copies; **six** synthetic candidate gate unit tests local PASS. Verified candidate ZIP checksum and per-file hashes; status `REVIEW_REQUIRED` rather than deploy approval.
+- PR #4 HEAD before this checkpoint `109fff3a6abcc5f5f0ceec8b355024e5910fe4c0`; combined status returned **zero CI checks**. Do NOT label GitHub CI PASS.
+- No source app import, no npm install/build, no DB usage, no Hermes actions, no Drive write or production deploy.
+- Next gated task: private repo source import via secure tool that can transfer local artifact without credentials; manual secret/privacy review remains required. 
+
+
+## P0-IMPORT dependency provenance & import-review bundle — 2026-10-19
+- Owner ChatGPT, lane `P0-IMPORT` remains **IN_PROGRESS**, source app still not in GitHub. Workboard and new docs updated on PR #4 DRAFT.
+- **FAKTA TERVERIFIKASI**: ZIP asli sha256 `25ce1448015b34144dc16a67609a61f9ad5dd7ef70fd647b401c3d22caf06813`. Internal archived `node_modules/.package-lock.json` sha256 `511861fd1a69773bf35948d076910bc8cf8a867faa8c0ae40661fe1db22696f5`: npm v3, 523 package records; all 523 `sha512` entries with `registry.npmjs.org` host; 5 `hasInstallScript` flags. Root manifest 33 direct dependencies found and basic semver-compatible. This internal lock **NOT a root package-lock** and cannot be used directly for npm ci.
+- New artifact **locally only** `GMT_Procurement_SOURCE_IMPORT_REVIEW_20261019.zip` SHA256 `2af9eca7398bc3ca40cc4dddfef27eec06dc9738b9a7600156c897ba6865abab`, 127.997 bytes, 126 source files (321.837 bytes) + 2 review metadata files. Excludes historic root README and .gitignore due to existing GitHub path conflicts, confirmed against actual PR #4 tree at `c6c86d3f...`.
+- Manifest/per-file SHA and ZIP CRC checked locally. Artifact **REVIEW ONLY, NOT DEPLOYABLE**; no email/credentials printed. Source LoginPage has prefilled email identifier; value not logged/copied to docs, requires UX/privacy review.
+- Docs created: `docs/DEPENDENCY_PROVENANCE_FROM_ORIGINAL_ZIP_20261019.md`, `docs/SOURCE_ONLY_IMPORT_HANDOFF_20261019.md`. The private code import handoff has exact ownership/scope/forbidden actions/acceptance/minimum tests.
+- **BLOCKERS:** secure transport of 126 source file bytes into GitHub Private (connector text-only; don't use public links or user secrets), manual secret/PII review, root lockfile reconciliation, isolated compile/regression, project-level auth tests, hosting verification.
+- NEXT: scoped source import when secure private transfer becomes available; no forced production changes. Hermes CI 8/8 prebuild synthetic PASS and idle PASS earlier, not evidence of full build.
+- Status: Overall Source/Foundation verified local import bundle, source GitHub import PENDING. Module Progress no new features. Source/Test static/provenance inspection, full build PENDING. Hosting NOT VERIFIED. Deploy NOT READY. LOCK NO.
