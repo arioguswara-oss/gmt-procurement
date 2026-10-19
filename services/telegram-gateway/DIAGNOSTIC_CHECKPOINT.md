@@ -83,3 +83,13 @@ for any future deployment; source-only publication does not authorize deployment
 This reproduces the symptom but does not identify the failing API or prove deployed SHA.
 No Cloudflare configuration, credentials, webhook or deployment was changed.
 
+
+## Post-publication evidence
+Implementation SHA: 951d6b23abd449cd3aa1e30917415922fb7806a3.
+All 8 remote files read back at that SHA match the locally verified files exactly.
+PR #2 remains open, draft, unmerged. Branch update used expected HEAD and force:false.
+CI run https://github.com/arioguswara-oss/gmt-procurement/actions/runs/39209014230
+reports FAILURE, but the authenticated GitHub UI annotation confirms the job did not start:
+account payment failure or spending-limit restriction. This is BLOCKED_CI (account/billing),
+not a test failure. No billing or spending settings changed. Rio must review that gate before
+an authorized rerun; local tests remain 110/110 PASS. This follow-up changes evidence only.
