@@ -88,3 +88,14 @@ Progres source tidak disamakan dengan hosting. READY TO DEPLOY hanya jika syntax
 - NEXT: jalankan 8 unit tests untuk gate+stager pada sandbox Hermes *on-demand* tanpa ZIP produksi; lalu lakukan source ZIP read-only scan dan selective staging hanya ketika file dapat diakses di lingkungan kerja lokal yang aman.
 - Source completeness: historical review package bukan artifact build; manifest/asset/lockfile/migration perlu review sebelum full import.
 - Source/Test: 4/4 gate tests PASS historis, stager tests PENDING, build PENDING. Hosting: NOT VERIFIED. Deploy Readiness: NOT READY. LOCK: NO.
+
+## P0-IMPORT checkpoint — 2026-10-19 (local source ZIP available again)
+- Source ZIP berhasil dibaca secara lokal dan CRC test PASS; 200.209.381 bytes; 37.761 entries; SHA256 cocok: `25ce1448015b34144dc16a67609a61f9ad5dd7ef70fd647b401c3d22caf06813`.
+- **IN_PROGRESS**: source-only candidate berhasil distage lokal (128 file / 322.562 bytes; compressed 128.217 bytes), candidate ZIP SHA256 `de2673a06b9975b722078c825a72c8c9d68e4e1edb5fffa3133d599bea38bbe5`, CRC PASS, manifest includes hashes.
+- Safety screening: no blocker with local allowlist and pattern scan, but secret/PII clearance manual PENDING. No `.env*`, storage, logs, uploads, third-party node_modules, historic patches, or seed scripts.
+- Syntax-only TypeScript parser **113/113 files, 0 diagnostics**; relative import resolution **333 references, 0 missing**. **NOT** complete build/CI/regression.
+- Dependency issue: no root lockfile in original ZIP; reproducibility/baseline dependency graph PENDING. Schema 24 Prisma models, 20 module files and 16 controller files inventoried.
+- **NOT DONE**: source import to GitHub, dependency build, environment/hosting verification, migrations, deployment, lock.
+- PR #4 remains DRAFT. GitHub docs/SOURCE_IMPORT_GATE.md now captures this checkpoint; source candidate remains private/local and is **NOT a deploy ZIP**.
+- NEXT: scoped manual security/completeness audit and lock strategy, then import to dedicated branch; no production/Drive writes, no SANRO changes.
+- Progress summary: Overall Source/Foundation = selective staging DONE_SOURCE but import IN_PROGRESS; Module Progress = audit only; Source/Test = syntax PASS / build PENDING; Hosting = NOT VERIFIED; Deploy = NOT READY; LOCK = NO.
