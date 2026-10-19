@@ -11,6 +11,7 @@ const receiptInclude = Prisma.validator<Prisma.ReceiptInclude>()({
       project: true,
       purchaseOrder: true,
       billTo: true,
+      taxDocuments: { include: { documents: true } },
     },
   },
   documents: true,
