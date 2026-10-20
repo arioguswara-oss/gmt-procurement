@@ -66,6 +66,7 @@ enum InvoiceStatus {
 
 enum TaxDocumentStatus {
   UPLOADED
+  VERIFIED
   REPLACED
   CANCELLED
 }
@@ -122,6 +123,7 @@ model User {
   invoicesCreated           Invoice[]           @relation("InvoiceCreatedBy")
   invoicesUpdated           Invoice[]           @relation("InvoiceUpdatedBy")
   taxDocumentsUploaded      TaxDocument[]       @relation("TaxDocumentUploadedBy")
+  taxDocumentsVerified      TaxDocument[]       @relation("TaxDocumentVerifiedBy")
   receiptsCreated           Receipt[]           @relation("ReceiptCreatedBy")
   paymentsCreated           Payment[]           @relation("PaymentCreatedBy")
   documentsUploaded         Document[]          @relation("DocumentUploadedBy")
@@ -575,10 +577,13 @@ model TaxDocument {
   status       TaxDocumentStatus @default(UPLOADED)
   uploadedById BigInt            @map("uploaded_by_id") @db.UnsignedBigInt
   uploadedAt   DateTime          @default(now()) @map("uploaded_at") @db.DateTime(3)
+  verifiedById BigInt?           @map("verified_by_id") @db.UnsignedBigInt
+  verifiedAt   DateTime?         @map("verified_at") @db.DateTime(3)
   notes        String?           @db.Text
 
   invoice    Invoice    @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
   uploadedBy User       @relation("TaxDocumentUploadedBy", fields: [uploadedById], references: [id], onDelete: Restrict)
+  verifiedBy User?      @relation("TaxDocumentVerifiedBy", fields: [verifiedById], references: [id], onDelete: Restrict)
   documents  Document[]
 
   @@index([invoiceId])

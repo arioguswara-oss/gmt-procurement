@@ -13,8 +13,8 @@ function document(type, overrides = {}) {
     documentType: type, storagePath: __filename, originalFilename: 'archived.pdf',
     mimeType: 'application/pdf', ...overrides };
 }
-const tax = (status = TaxDocumentStatus.UPLOADED, type = DocumentType.TAX_INVOICE) =>
-  ({ status, documents: [{ documentType: type }] });
+const tax = (status = TaxDocumentStatus.VERIFIED, type = DocumentType.TAX_INVOICE) =>
+  ({ status, verifiedById: 7n, verifiedAt: new Date('2026-10-20T00:00:00Z'), documents: [{ documentType: type }] });
 const invoice = (taxDocuments = [tax()], overrides = {}) =>
   ({ id: 9n, projectId: 3n, status: InvoiceStatus.FINAL, taxDocuments, ...overrides });
 function service(doc, inv = invoice(), receipt = { invoiceId: 9n, status: ReceiptStatus.FINAL }) {

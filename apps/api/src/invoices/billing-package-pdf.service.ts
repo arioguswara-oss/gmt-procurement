@@ -56,7 +56,7 @@ export class BillingPackagePdfService {
     if (!receivingDocs.length) throw new BadRequestException('Signed DO / Receiving Evidence belum tersedia');
 
     const taxDocs = this.uniqueDocuments(row.taxDocuments.flatMap((tax) =>
-      tax.status !== TaxDocumentStatus.UPLOADED ? [] : tax.documents.filter((doc) => doc.documentType === DocumentType.TAX_INVOICE),
+      tax.status !== TaxDocumentStatus.VERIFIED ? [] : tax.documents.filter((doc) => doc.documentType === DocumentType.TAX_INVOICE),
     ));
     if (!taxDocs.length) throw new BadRequestException('Faktur Pajak Coretax belum tersedia');
 

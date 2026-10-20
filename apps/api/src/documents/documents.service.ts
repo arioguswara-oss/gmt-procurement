@@ -97,6 +97,7 @@ export class DocumentsService {
     const project = await this.prisma.project.findUnique({ where: { id: projectId } });
     if (!project) throw new NotFoundException('Project tidak ditemukan');
     await this.assertBelongsToProject(projectId, dto);
+    await this.assertBillingAllowed({ documentType: dto.documentType, projectId, invoiceId: dto.invoiceId ? BigInt(dto.invoiceId) : undefined, receiptId: dto.receiptId ? BigInt(dto.receiptId) : undefined });
 
     // Apply the same Coretax rule even via generic project-document uploads.
     if (dto.documentType === DocumentType.TAX_INVOICE) {
@@ -134,7 +135,15 @@ export class DocumentsService {
     await writeFile(storagePath, file.buffer, { flag: 'wx' });
 
     try {
-      const document = await this.prisma.document.create({
+      const document = await this.prisma.$transaction(async (tx) => {
+        if (dto.documentType === DocumentType.TAX_INVOICE) {
+          const active = await tx.taxDocument.updateMany({
+            where: { id: BigInt(dto.taxDocumentId!), invoiceId: BigInt(dto.invoiceId!), status: TaxDocumentStatus.UPLOADED },
+            data: { status: TaxDocumentStatus.UPLOADED },
+          });
+          if (active.count !== 1) throw new BadRequestException('Faktur Pajak sudah diverifikasi atau diganti; upload record baru');
+        }
+        return tx.document.create({
         data: {
           projectId,
           projectOriginId: dto.projectOriginId ? BigInt(dto.projectOriginId) : undefined,
@@ -156,6 +165,7 @@ export class DocumentsService {
           notes: dto.notes,
           uploadedById: userId,
         },
+        });
       });
 
       await this.activity.write({
@@ -187,6 +197,7 @@ export class DocumentsService {
     receiptId?: bigint;
     notes?: string;
   }) {
+    await this.assertBillingAllowed(input);
     const project = await this.prisma.project.findUnique({ where: { id: input.projectId } });
     if (!project) throw new NotFoundException('Project tidak ditemukan');
 
@@ -242,10 +253,7 @@ export class DocumentsService {
     return { document, buffer: await readFile(document.storagePath) };
   }
 
-  async download(id: bigint) {
-    const document = await this.prisma.document.findUnique({ where: { id } });
-    if (!document) throw new NotFoundException('Dokumen tidak ditemukan');
-
+  private async assertBillingAllowed(document: { documentType: DocumentType; projectId: bigint; invoiceId?: bigint | null; receiptId?: bigint | null }) {
     // Archived PDFs must not bypass the mandatory Coretax gate enforced by
     // the live Invoice/Kwitansi render and PDF routes.
     if (document.documentType === DocumentType.INVOICE_PDF ||
@@ -273,6 +281,14 @@ export class DocumentsService {
         }
       }
     }
+
+  }
+
+  async download(id: bigint) {
+    const document = await this.prisma.document.findUnique({ where: { id } });
+    if (!document) throw new NotFoundException('Dokumen tidak ditemukan');
+
+    await this.assertBillingAllowed(document);
 
     if (!existsSync(document.storagePath)) throw new NotFoundException('File fisik tidak ditemukan di storage');
 

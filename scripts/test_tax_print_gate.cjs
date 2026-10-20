@@ -8,13 +8,13 @@ const { InvoicePrintService } = require('../apps/api/dist/invoices/invoice-print
 const { ReceiptPrintService } = require('../apps/api/dist/receipts/receipt-print.service');
 
 const invoice = (status = 'FINAL', taxDocuments = []) => ({ status, taxDocuments });
-const tax = (status = 'UPLOADED', documentType = 'TAX_INVOICE') =>
-  ({ status, documents: [{ documentType }] });
+const tax = (status = 'VERIFIED', documentType = 'TAX_INVOICE') =>
+  ({ status, verifiedById: 7n, verifiedAt: new Date('2026-10-20T00:00:00Z'), documents: [{ documentType }] });
 
 test('print gate rejects FINAL invoice with no Coretax attachment', () =>
   assert.throws(() => assertInvoicePrintable(invoice()), { status: 400 }));
 test('print gate rejects unlinked/non-tax attachments', () =>
-  assert.throws(() => assertInvoicePrintable(invoice('FINAL', [tax('UPLOADED', 'ORIGINAL_PO')])), { status: 400 }));
+  assert.throws(() => assertInvoicePrintable(invoice('FINAL', [tax('VERIFIED', 'ORIGINAL_PO')])), { status: 400 }));
 test('print gate rejects REPLACED tax document', () =>
   assert.throws(() => assertInvoicePrintable(invoice('FINAL', [tax('REPLACED')])), { status: 400 }));
 test('print gate rejects CANCELLED tax document', () =>

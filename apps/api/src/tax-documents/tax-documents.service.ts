@@ -1,4 +1,5 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { DocumentType, InvoiceStatus, TaxDocumentStatus } from '@prisma/client';
 import { ActivityLogsService } from '../activity-logs/activity-logs.service';
 import { DocumentsService } from '../documents/documents.service';
@@ -12,7 +13,40 @@ export class TaxDocumentsService {
     private readonly prisma: PrismaService,
     private readonly documents: DocumentsService,
     private readonly activity: ActivityLogsService,
+    private readonly config: ConfigService,
   ) {}
+
+  async verificationAccess(userId: bigint) {
+    const configured = String(this.config.get('CORETAX_VERIFIER_USER_ID') ?? '');
+    if (!/^[1-9]\d*$/.test(configured) || configured !== userId.toString()) return { canVerify: false };
+    const user = await this.prisma.user.findUnique({ where: { id: userId }, select: { active: true, role: true } });
+    return { canVerify: !!user?.active && user.role !== 'VIEWER' };
+  }
+
+  async verify(invoiceId: bigint, taxId: bigint, userId: bigint) {
+    if (!(await this.verificationAccess(userId)).canVerify) {
+      throw new ForbiddenException('Hanya akun Pak Supri yang ditetapkan dapat memverifikasi Faktur Pajak');
+    }
+    return this.prisma.$transaction(async (tx) => {
+      // Conditional update locks the proof row; replacement and attachment writes
+      // use the same row, so a stale verification cannot resurrect REPLACED proof.
+      const verifiedAt = new Date();
+      const changed = await tx.taxDocument.updateMany({
+        where: { id: taxId, invoiceId, status: TaxDocumentStatus.UPLOADED,
+          invoice: { status: { not: InvoiceStatus.CANCELLED } },
+          documents: { some: { documentType: DocumentType.TAX_INVOICE, invoiceId } } },
+        data: { status: TaxDocumentStatus.VERIFIED, verifiedById: userId, verifiedAt },
+      });
+      if (changed.count !== 1) throw new BadRequestException('Faktur Pajak bukan upload aktif atau sudah diverifikasi/diganti');
+      const tax = await tx.taxDocument.findUniqueOrThrow({ where: { id: taxId }, include: { invoice: true, documents: true } });
+      await tx.activityLog.create({ data: {
+        projectId: tax.invoice.projectId, userId, action: 'VERIFIED', entityType: 'TAX_DOCUMENT', entityId: taxId,
+        description: 'Faktur Pajak Coretax diverifikasi secara eksplisit oleh Pak Supri',
+        newValuesJson: { status: 'VERIFIED', verifiedById: userId.toString(), verifiedAt: verifiedAt.toISOString() },
+      } });
+      return tax;
+    });
+  }
 
   async list(invoiceId: bigint) {
     const exists = await this.prisma.invoice.findUnique({ where: { id: invoiceId }, select: { id: true } });
@@ -54,7 +88,7 @@ export class TaxDocumentsService {
 
       await this.prisma.$transaction(async (tx) => {
         await tx.taxDocument.updateMany({
-          where: { invoiceId, id: { not: taxDocument.id }, status: TaxDocumentStatus.UPLOADED },
+          where: { invoiceId, id: { not: taxDocument.id }, status: { in: [TaxDocumentStatus.UPLOADED, TaxDocumentStatus.VERIFIED] } },
           data: { status: TaxDocumentStatus.REPLACED },
         });
         await tx.invoice.update({

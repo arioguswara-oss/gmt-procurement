@@ -67,6 +67,9 @@ test('READY_TO_FINALIZE allows replacing an existing Coretax before Invoice FINA
     taxDocument: {
       create: async ({ data }) => {
         assert.equal(data.invoiceId, 9n);
+        assert.equal(data.status, 'UPLOADED');
+        assert.equal(data.verifiedById, undefined);
+        assert.equal(data.verifiedAt, undefined);
         return { id: 6n, status: 'UPLOADED' };
       },
       findUnique: async () => ({ id: 6n, status: 'UPLOADED', documents: [{ id: 7n }] }),
@@ -76,6 +79,7 @@ test('READY_TO_FINALIZE allows replacing an existing Coretax before Invoice FINA
       taxDocument: { updateMany: async ({ where, data }) => {
         assert.equal(where.invoiceId, 9n);
         assert.equal(where.id.not, 6n);
+        assert.deepEqual(where.status.in, ['UPLOADED', 'VERIFIED']);
         assert.equal(data.status, 'REPLACED');
         superseded = true;
       } },

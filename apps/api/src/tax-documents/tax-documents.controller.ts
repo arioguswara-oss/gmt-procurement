@@ -11,6 +11,16 @@ import { TaxDocumentsService } from './tax-documents.service';
 export class TaxDocumentsController {
   constructor(private readonly service: TaxDocumentsService) {}
 
+  @Get('verification-access')
+  verificationAccess(@CurrentUser() user: AuthenticatedUser) {
+    return this.service.verificationAccess(user.id);
+  }
+
+  @Post(':taxId/verify')
+  verify(@Param('invoiceId') invoiceId: string, @Param('taxId') taxId: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.service.verify(BigInt(invoiceId), BigInt(taxId), user.id);
+  }
+
   @Get()
   list(@Param('invoiceId') invoiceId: string) {
     return this.service.list(BigInt(invoiceId));
