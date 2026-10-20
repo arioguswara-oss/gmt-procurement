@@ -327,3 +327,13 @@ This checkpoint supersedes earlier staging/Hermes prerequisites for package hand
 - Source re-read at PR #16 head `828734f8675d44358fdf4ff048df126ff617b38c` confirms: invoice finalization can skip tax when REQUIRE_TAX_INVOICE_BEFORE_FINAL_INVOICE is false; tax uploads reject FINAL invoices. In addition, finalize's activeTax predicate excludes CANCELLED only, thus also counts REPLACED evidence. These are source findings, not observed production failures.
 - Recommended lifecycle decision for Rio: require current VERIFIED Coretax with linked evidence before NEW finalization; exclude REPLACED/CANCELLED evidence. Existing FINAL records lacking proof need a separately defined recovery path; do not silently rewrite their status or permit late uploads without that decision. This recommendation has not been implemented.
 - Current concrete tooling limitation: local SQL reads, building and ZIP packaging are unavailable in this session. GitHub read/write is available. No deployment ZIP has been created and no migration has been validated against the supplied SQL.
+
+## Mandatory verified Coretax before FINAL — Rio approved, 2026-10-20 23:55 WIB
+
+- Rio explicitly decided: invoice must have Coretax verified by Pak Supri before FINAL. The prior decision blocker for NEW finalization is resolved.
+- Source commit `58f509a80511555ab7156ee3e7658c49930b2c3c` removes the optional legacy-setting bypass in InvoicesService.finalize. Requires VERIFIED, positive verifier ID, valid verification time, linked TAX_INVOICE belonging to the invoice, and READY_TO_FINALIZE status. Existing verification endpoint restricts the verification action to the configured Pak Supri account.
+- UPLOADED, REPLACED and CANCELLED tax proof no longer satisfy new finalization. No automatic verification or production data rewrite.
+- Eight isolated JavaScript predicate checks PASS (verified allow, uploaded/replaced/cancelled reject, absent verifier/time/file and wrong invoice reject). This is NOT a TypeScript build, DB/concurrency test, full regression run or hosting verification. Latest code has not been built.
+- Existing FINAL idempotent return is preserved; this change does not recover legacy FINAL invoices missing proof. Real concurrent upload/finalization behavior still needs scrutiny; do not claim atomic race protection.
+- Direct-hosting acceptance workflow remains: package to Rio, Rio installs, Pak Supri tests installed app. No staging or Hermes prerequisite.
+- SQL attachment remains unread due unavailable local execution environment. Build/ZIP packaging not completed; no deployment or database modification.
