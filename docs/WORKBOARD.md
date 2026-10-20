@@ -314,3 +314,16 @@ Progres source tidak disamakan dengan hosting. READY TO DEPLOY hanya jika syntax
 - **Not run in this attempt:** Bubblewrap, API/web builds, DB-free regressions PR #8–#16, source-failure fixes, and Hermes check-run publication. No source/test failure was observed. No GitHub-hosted workflow was dispatched.
 - GitHub status endpoint for HEAD returned zero statuses; PR-triggered workflow-runs endpoint returned zero runs for this SHA.
 - **Readiness:** Hermes validation BLOCKED on an agent-controllable gmtci command channel; current source outcome NOT VERIFIED on Hermes. Deploy Readiness NOT READY; PR remains DRAFT. No production/database/merge/deploy/SANRO changes.
+
+## Owner release workflow correction — 2026-10-20 23:53 WIB
+
+This checkpoint supersedes earlier staging/Hermes prerequisites for package handoff, based on Rio's explicit instructions in this session.
+
+- Deliver one complete deployment candidate to Rio. Rio installs it on hosting, then Pak Supri performs functional and browser/PDF acceptance directly on the installed application. Pak Supri is NOT asked to test staging.
+- Do not require a staging environment, isolated DB integration test, or Hermes validation before handing over the package. Do not invoke Hermes or GitHub-hosted Actions for this task. Telegram is deferred and is not a Procurement release dependency.
+- Deferred checks must be reported as unperformed; removing a prerequisite does not turn it into PASS. Existing build evidence applies only to the source SHA actually tested.
+- Package preparation still includes source/schema compatibility review, required additive database changes, verified verifier identity configuration, installation instructions, backup/rollback instructions, and a complete build artifact. No production deploy or database mutation is authorized by this checkpoint.
+- Rio supplied attachment `Salinan hype6006_gayuh_gmtproc.sql`. Its existence is confirmed; its contents have NOT been inspected because the execution environment is unavailable. Do not report a missing database file or ask for re-upload.
+- Source re-read at PR #16 head `828734f8675d44358fdf4ff048df126ff617b38c` confirms: invoice finalization can skip tax when REQUIRE_TAX_INVOICE_BEFORE_FINAL_INVOICE is false; tax uploads reject FINAL invoices. In addition, finalize's activeTax predicate excludes CANCELLED only, thus also counts REPLACED evidence. These are source findings, not observed production failures.
+- Recommended lifecycle decision for Rio: require current VERIFIED Coretax with linked evidence before NEW finalization; exclude REPLACED/CANCELLED evidence. Existing FINAL records lacking proof need a separately defined recovery path; do not silently rewrite their status or permit late uploads without that decision. This recommendation has not been implemented.
+- Current concrete tooling limitation: local SQL reads, building and ZIP packaging are unavailable in this session. GitHub read/write is available. No deployment ZIP has been created and no migration has been validated against the supplied SQL.
