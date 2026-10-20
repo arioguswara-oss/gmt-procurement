@@ -269,10 +269,17 @@ export class InvoicesService {
     if (current.status === InvoiceStatus.FINAL) return current;
     if (current.status === InvoiceStatus.CANCELLED) throw new BadRequestException('Invoice sudah dibatalkan');
 
-    const requireTax = await this.settingBoolean('REQUIRE_TAX_INVOICE_BEFORE_FINAL_INVOICE', true);
-    const activeTax = current.taxDocuments.filter((tax) => tax.status !== TaxDocumentStatus.CANCELLED && tax.documents.some((doc) => doc.documentType === DocumentType.TAX_INVOICE));
-    if (requireTax && !activeTax.length) throw new BadRequestException('Upload Faktur Pajak Coretax terlebih dahulu');
-    if (requireTax && current.status !== InvoiceStatus.READY_TO_FINALIZE) {
+    // Rio: verified Coretax is mandatory before finalization, regardless of legacy settings.
+    const activeTax = current.taxDocuments.filter((tax) =>
+      tax.status === TaxDocumentStatus.VERIFIED &&
+      tax.verifiedById != null && tax.verifiedById > 0n &&
+      tax.verifiedAt != null && Number.isFinite(new Date(tax.verifiedAt).getTime()) &&
+      tax.documents.some((doc) => doc.documentType === DocumentType.TAX_INVOICE && doc.invoiceId === id),
+    );
+    if (!activeTax.length) {
+      throw new BadRequestException('Faktur Pajak Coretax wajib diverifikasi Pak Supri sebelum Invoice FINAL');
+    }
+    if (current.status !== InvoiceStatus.READY_TO_FINALIZE) {
       throw new BadRequestException('Invoice belum READY_TO_FINALIZE');
     }
 
