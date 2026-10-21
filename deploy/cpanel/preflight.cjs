@@ -7,7 +7,7 @@ const checks = [];
 const add = (name, ok, detail='') => checks.push({name, ok, detail});
 
 const major = Number(process.versions.node.split('.')[0]);
-add('Node.js >= 20', major >= 20, process.version);
+add('Node.js >= 22', major >= 22, process.version);
 add('app.js', fs.existsSync(path.join(root, 'app.js')), path.join(root, 'app.js'));
 add('API build', fs.existsSync(path.join(root, 'apps/api/dist/main.js')), 'apps/api/dist/main.js');
 add('React build', fs.existsSync(path.join(root, 'apps/web/dist/index.html')), 'apps/web/dist/index.html');

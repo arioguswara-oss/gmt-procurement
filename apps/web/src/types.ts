@@ -164,6 +164,8 @@ export type TaxDocument = {
   documentDate?: string | null;
   status: string;
   uploadedAt: string;
+  verifiedById?: string | null;
+  verifiedAt?: string | null;
   documents?: DocumentRecord[];
 };
 

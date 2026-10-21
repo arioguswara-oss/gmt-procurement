@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { InvitationsModule } from './invitations/invitations.module';
 import { CompanyProfileModule } from './company-profile/company-profile.module';
 import { BusinessPartnersModule } from './business-partners/business-partners.module';
 import { ProjectsModule } from './projects/projects.module';
@@ -30,6 +31,7 @@ import { validateEnvironment } from './config/env.validation';
     PdfModule,
     UsersModule,
     AuthModule,
+    InvitationsModule,
     CompanyProfileModule,
     BusinessPartnersModule,
     ActivityLogsModule,
