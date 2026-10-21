@@ -60,6 +60,9 @@ export class InvitationsService {
   async accept(dto: AcceptInvitationDto) {
     const now = new Date();
     const tokenHash = sha256(dto.token);
+    if (Buffer.byteLength(dto.password, 'utf8') > 72) {
+      throw new BadRequestException('Password melebihi batas 72 byte bcrypt');
+    }
     const passwordHash = await bcrypt.hash(dto.password, 12);
     return this.prisma.$transaction(async (tx) => {
       const claimed = await tx.userInvitation.updateMany({
