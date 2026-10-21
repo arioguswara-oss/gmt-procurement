@@ -14,6 +14,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <NavLink to="/" end>Dashboard</NavLink>
           <NavLink to="/projects">Projects</NavLink>
           <NavLink to="/partners">Customers / Partners</NavLink>
+          {user?.role === "SUPER_ADMIN" && <NavLink to="/admin/users">Pengguna & Undangan</NavLink>}
         </nav>
         <div className="sidebar-foot">
           <div className="user-card"><strong>{user?.name}</strong><span>{user?.role?.replaceAll('_', ' ')}</span></div>
