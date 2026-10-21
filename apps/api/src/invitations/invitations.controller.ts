@@ -1,9 +1,10 @@
-import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { UserRole } from '@prisma/client';
 import { AuthenticatedUser, CurrentUser } from '../common/decorators/current-user.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
+import { TokenInvitationDto } from './dto/token-invitation.dto';
 import { CreateInvitationDto } from './dto/create-invitation.dto';
 import { AcceptInvitationDto } from './dto/accept-invitation.dto';
 import { UpdateUserActiveDto } from './dto/update-user-active.dto';
@@ -34,9 +35,9 @@ export class InvitationsController {
     return this.service.setActive(user.id, BigInt(id), dto.active);
   }
 
-  @Get('preview')
-  preview(@Query('token') token: string) {
-    return this.service.preview(token);
+  @Post('preview')
+  preview(@Body() dto: TokenInvitationDto) {
+    return this.service.preview(dto.token);
   }
 
   @Post('accept')
